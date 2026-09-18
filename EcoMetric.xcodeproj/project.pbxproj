@@ -22,6 +22,10 @@
 		1B106743305DB1AA00985EFC /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106742305DB1AA00985EFC /* DashboardViewModel.swift */; };
 		1B106745305DB2F400985EFC /* DataInputModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106744305DB2F400985EFC /* DataInputModels.swift */; };
 		1B106747305DB30500985EFC /* DataInputViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106746305DB30500985EFC /* DataInputViewModel.swift */; };
+		1B106749305DB3FA00985EFC /* AIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106748305DB3FA00985EFC /* AIModels.swift */; };
+		1B10674B305DB40B00985EFC /* AIRecommendationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10674A305DB40B00985EFC /* AIRecommendationService.swift */; };
+		1B10674D305DB41A00985EFC /* MockAIRecommendationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10674C305DB41A00985EFC /* MockAIRecommendationService.swift */; };
+		1B10674F305DB42A00985EFC /* AIRecommendationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10674E305DB42A00985EFC /* AIRecommendationsViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +64,10 @@
 		1B106742305DB1AA00985EFC /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
 		1B106744305DB2F400985EFC /* DataInputModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataInputModels.swift; sourceTree = "<group>"; };
 		1B106746305DB30500985EFC /* DataInputViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataInputViewModel.swift; sourceTree = "<group>"; };
+		1B106748305DB3FA00985EFC /* AIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIModels.swift; sourceTree = "<group>"; };
+		1B10674A305DB40B00985EFC /* AIRecommendationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIRecommendationService.swift; sourceTree = "<group>"; };
+		1B10674C305DB41A00985EFC /* MockAIRecommendationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAIRecommendationService.swift; sourceTree = "<group>"; };
+		1B10674E305DB42A00985EFC /* AIRecommendationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIRecommendationsViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -156,6 +164,7 @@
 			children = (
 				1B10673C305DB17500985EFC /* DashboardModels.swift */,
 				1B106744305DB2F400985EFC /* DataInputModels.swift */,
+				1B106748305DB3FA00985EFC /* AIModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -165,6 +174,8 @@
 			children = (
 				1B10673E305DB18700985EFC /* DashboardService.swift */,
 				1B106740305DB19600985EFC /* MockDashboardService.swift */,
+				1B10674A305DB40B00985EFC /* AIRecommendationService.swift */,
+				1B10674C305DB41A00985EFC /* MockAIRecommendationService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -174,6 +185,7 @@
 			children = (
 				1B106742305DB1AA00985EFC /* DashboardViewModel.swift */,
 				1B106746305DB30500985EFC /* DataInputViewModel.swift */,
+				1B10674E305DB42A00985EFC /* AIRecommendationsViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -389,15 +401,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1B10674F305DB42A00985EFC /* AIRecommendationsViewModel.swift in Sources */,
 				1B10671F305DABD200985EFC /* EcoMetricApp.swift in Sources */,
 				1B106731305DAFFC00985EFC /* DashboardView.swift in Sources */,
+				1B10674D305DB41A00985EFC /* MockAIRecommendationService.swift in Sources */,
 				1B10673B305DB0A800985EFC /* RootTabView.swift in Sources */,
 				1B106743305DB1AA00985EFC /* DashboardViewModel.swift in Sources */,
 				1B10672F305DAFD900985EFC /* EcoTheme.swift in Sources */,
 				1B106747305DB30500985EFC /* DataInputViewModel.swift in Sources */,
 				1B106733305DB05500985EFC /* DataInputView.swift in Sources */,
 				1B10673D305DB17500985EFC /* DashboardModels.swift in Sources */,
+				1B10674B305DB40B00985EFC /* AIRecommendationService.swift in Sources */,
 				1B106737305DB08200985EFC /* ReportsView.swift in Sources */,
+				1B106749305DB3FA00985EFC /* AIModels.swift in Sources */,
 				1B106741305DB19600985EFC /* MockDashboardService.swift in Sources */,
 				1B106739305DB09500985EFC /* ProfileView.swift in Sources */,
 				1B10673F305DB18700985EFC /* DashboardService.swift in Sources */,
