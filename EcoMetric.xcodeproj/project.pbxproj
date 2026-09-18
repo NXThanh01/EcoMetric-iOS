@@ -26,6 +26,13 @@
 		1B10674B305DB40B00985EFC /* AIRecommendationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10674A305DB40B00985EFC /* AIRecommendationService.swift */; };
 		1B10674D305DB41A00985EFC /* MockAIRecommendationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10674C305DB41A00985EFC /* MockAIRecommendationService.swift */; };
 		1B10674F305DB42A00985EFC /* AIRecommendationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10674E305DB42A00985EFC /* AIRecommendationsViewModel.swift */; };
+		1B106751305DB4AE00985EFC /* ReportModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106750305DB4AE00985EFC /* ReportModels.swift */; };
+		1B106753305DB4BF00985EFC /* ReportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106752305DB4BF00985EFC /* ReportService.swift */; };
+		1B106755305DB4CF00985EFC /* MockReportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106754305DB4CF00985EFC /* MockReportService.swift */; };
+		1B106757305DB4DE00985EFC /* ReportsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106756305DB4DE00985EFC /* ReportsViewModel.swift */; };
+		1B106759305DB55E00985EFC /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106758305DB55E00985EFC /* SplashView.swift */; };
+		1B10675B305DB57000985EFC /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10675A305DB57000985EFC /* AppRootView.swift */; };
+		1B10675D305DB60900985EFC /* AIAnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10675C305DB60900985EFC /* AIAnalysisView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,6 +75,13 @@
 		1B10674A305DB40B00985EFC /* AIRecommendationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIRecommendationService.swift; sourceTree = "<group>"; };
 		1B10674C305DB41A00985EFC /* MockAIRecommendationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAIRecommendationService.swift; sourceTree = "<group>"; };
 		1B10674E305DB42A00985EFC /* AIRecommendationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIRecommendationsViewModel.swift; sourceTree = "<group>"; };
+		1B106750305DB4AE00985EFC /* ReportModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportModels.swift; sourceTree = "<group>"; };
+		1B106752305DB4BF00985EFC /* ReportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportService.swift; sourceTree = "<group>"; };
+		1B106754305DB4CF00985EFC /* MockReportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockReportService.swift; sourceTree = "<group>"; };
+		1B106756305DB4DE00985EFC /* ReportsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsViewModel.swift; sourceTree = "<group>"; };
+		1B106758305DB55E00985EFC /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
+		1B10675A305DB57000985EFC /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
+		1B10675C305DB60900985EFC /* AIAnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAnalysisView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -155,6 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				1B10671E305DABD200985EFC /* EcoMetricApp.swift */,
+				1B10675A305DB57000985EFC /* AppRootView.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -165,6 +180,7 @@
 				1B10673C305DB17500985EFC /* DashboardModels.swift */,
 				1B106744305DB2F400985EFC /* DataInputModels.swift */,
 				1B106748305DB3FA00985EFC /* AIModels.swift */,
+				1B106750305DB4AE00985EFC /* ReportModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -176,6 +192,8 @@
 				1B106740305DB19600985EFC /* MockDashboardService.swift */,
 				1B10674A305DB40B00985EFC /* AIRecommendationService.swift */,
 				1B10674C305DB41A00985EFC /* MockAIRecommendationService.swift */,
+				1B106752305DB4BF00985EFC /* ReportService.swift */,
+				1B106754305DB4CF00985EFC /* MockReportService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -186,6 +204,7 @@
 				1B106742305DB1AA00985EFC /* DashboardViewModel.swift */,
 				1B106746305DB30500985EFC /* DataInputViewModel.swift */,
 				1B10674E305DB42A00985EFC /* AIRecommendationsViewModel.swift */,
+				1B106756305DB4DE00985EFC /* ReportsViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -199,6 +218,7 @@
 				1B10672A305DACE500985EFC /* Data */,
 				1B106729305DACDD00985EFC /* Dashboard */,
 				1B10673A305DB0A800985EFC /* RootTabView.swift */,
+				1B106758305DB55E00985EFC /* SplashView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -238,6 +258,7 @@
 			isa = PBXGroup;
 			children = (
 				1B106734305DB06B00985EFC /* AIRecommendationsView.swift */,
+				1B10675C305DB60900985EFC /* AIAnalysisView.swift */,
 			);
 			path = AI;
 			sourceTree = "<group>";
@@ -404,10 +425,14 @@
 				1B10674F305DB42A00985EFC /* AIRecommendationsViewModel.swift in Sources */,
 				1B10671F305DABD200985EFC /* EcoMetricApp.swift in Sources */,
 				1B106731305DAFFC00985EFC /* DashboardView.swift in Sources */,
+				1B106753305DB4BF00985EFC /* ReportService.swift in Sources */,
+				1B10675B305DB57000985EFC /* AppRootView.swift in Sources */,
 				1B10674D305DB41A00985EFC /* MockAIRecommendationService.swift in Sources */,
 				1B10673B305DB0A800985EFC /* RootTabView.swift in Sources */,
 				1B106743305DB1AA00985EFC /* DashboardViewModel.swift in Sources */,
 				1B10672F305DAFD900985EFC /* EcoTheme.swift in Sources */,
+				1B106757305DB4DE00985EFC /* ReportsViewModel.swift in Sources */,
+				1B106751305DB4AE00985EFC /* ReportModels.swift in Sources */,
 				1B106747305DB30500985EFC /* DataInputViewModel.swift in Sources */,
 				1B106733305DB05500985EFC /* DataInputView.swift in Sources */,
 				1B10673D305DB17500985EFC /* DashboardModels.swift in Sources */,
@@ -415,8 +440,11 @@
 				1B106737305DB08200985EFC /* ReportsView.swift in Sources */,
 				1B106749305DB3FA00985EFC /* AIModels.swift in Sources */,
 				1B106741305DB19600985EFC /* MockDashboardService.swift in Sources */,
+				1B106759305DB55E00985EFC /* SplashView.swift in Sources */,
 				1B106739305DB09500985EFC /* ProfileView.swift in Sources */,
 				1B10673F305DB18700985EFC /* DashboardService.swift in Sources */,
+				1B106755305DB4CF00985EFC /* MockReportService.swift in Sources */,
+				1B10675D305DB60900985EFC /* AIAnalysisView.swift in Sources */,
 				1B106735305DB06B00985EFC /* AIRecommendationsView.swift in Sources */,
 				1B106745305DB2F400985EFC /* DataInputModels.swift in Sources */,
 			);

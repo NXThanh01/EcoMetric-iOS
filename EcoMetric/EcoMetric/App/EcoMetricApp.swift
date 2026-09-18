@@ -13,7 +13,7 @@ struct EcoMetricApp: App {
     var body: some Scene {
         
         WindowGroup {
-            RootTabView()
+            AppRootView()
         }
     }
 }

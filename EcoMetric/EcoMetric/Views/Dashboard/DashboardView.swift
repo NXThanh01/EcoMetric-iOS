@@ -42,6 +42,7 @@ struct DashboardView: View {
                             header
 
                             if let data = viewModel.dashboard {
+                                
 
                                 mainEmissionCard(
                                     data.metrics
@@ -57,6 +58,15 @@ struct DashboardView: View {
 
                                 alertSection(
                                     data.alerts
+                                )
+                                .transition(
+                                    .opacity
+                                    .combined(
+                                        with:
+                                            .move(
+                                                edge: .bottom
+                                            )
+                                    )
                                 )
                             }
                         }

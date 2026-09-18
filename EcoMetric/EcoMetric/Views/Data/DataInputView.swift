@@ -9,11 +9,16 @@ import SwiftUI
 
 struct DataInputView: View {
 
+    let onOpenAI: () -> Void
+
     @StateObject private var viewModel =
         DataInputViewModel()
 
     @State private var selectedMonth =
         "Tháng 4/2025"
+
+    @State private var showAnalysis =
+        false
 
     private let months = [
         "Tháng 4/2025",
@@ -313,10 +318,7 @@ struct DataInputView: View {
 
         Button {
 
-            Task {
-                await viewModel
-                    .simulateUpload()
-            }
+            showAnalysis = true
 
         } label: {
 
@@ -542,12 +544,27 @@ struct DataInputView: View {
                         )
                 }
                 .padding()
-                .background(.white)
-                .clipShape(
-                    RoundedRectangle(
-                        cornerRadius: 14
-                    )
+                .background(
+                    EcoTheme.background
+                        .ignoresSafeArea()
                 )
+                .fullScreenCover(
+                    isPresented:
+                        $showAnalysis
+                ) {
+
+                    AIAnalysisView {
+
+                        showAnalysis = false
+
+                        DispatchQueue.main.asyncAfter(
+                            deadline:
+                                .now() + 0.25
+                        ) {
+                            onOpenAI()
+                        }
+                    }
+                }
             }
         }
     }
