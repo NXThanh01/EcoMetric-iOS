@@ -11,7 +11,7 @@ import SwiftUI
 struct EcoMetricApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Text("EcoMetric")
         }
     }
 }
