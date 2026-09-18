@@ -20,6 +20,8 @@
 		1B10673F305DB18700985EFC /* DashboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10673E305DB18700985EFC /* DashboardService.swift */; };
 		1B106741305DB19600985EFC /* MockDashboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106740305DB19600985EFC /* MockDashboardService.swift */; };
 		1B106743305DB1AA00985EFC /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106742305DB1AA00985EFC /* DashboardViewModel.swift */; };
+		1B106745305DB2F400985EFC /* DataInputModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106744305DB2F400985EFC /* DataInputModels.swift */; };
+		1B106747305DB30500985EFC /* DataInputViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106746305DB30500985EFC /* DataInputViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +58,8 @@
 		1B10673E305DB18700985EFC /* DashboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardService.swift; sourceTree = "<group>"; };
 		1B106740305DB19600985EFC /* MockDashboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDashboardService.swift; sourceTree = "<group>"; };
 		1B106742305DB1AA00985EFC /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
+		1B106744305DB2F400985EFC /* DataInputModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataInputModels.swift; sourceTree = "<group>"; };
+		1B106746305DB30500985EFC /* DataInputViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataInputViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -151,6 +155,7 @@
 			isa = PBXGroup;
 			children = (
 				1B10673C305DB17500985EFC /* DashboardModels.swift */,
+				1B106744305DB2F400985EFC /* DataInputModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -168,6 +173,7 @@
 			isa = PBXGroup;
 			children = (
 				1B106742305DB1AA00985EFC /* DashboardViewModel.swift */,
+				1B106746305DB30500985EFC /* DataInputViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -388,6 +394,7 @@
 				1B10673B305DB0A800985EFC /* RootTabView.swift in Sources */,
 				1B106743305DB1AA00985EFC /* DashboardViewModel.swift in Sources */,
 				1B10672F305DAFD900985EFC /* EcoTheme.swift in Sources */,
+				1B106747305DB30500985EFC /* DataInputViewModel.swift in Sources */,
 				1B106733305DB05500985EFC /* DataInputView.swift in Sources */,
 				1B10673D305DB17500985EFC /* DashboardModels.swift in Sources */,
 				1B106737305DB08200985EFC /* ReportsView.swift in Sources */,
@@ -395,6 +402,7 @@
 				1B106739305DB09500985EFC /* ProfileView.swift in Sources */,
 				1B10673F305DB18700985EFC /* DashboardService.swift in Sources */,
 				1B106735305DB06B00985EFC /* AIRecommendationsView.swift in Sources */,
+				1B106745305DB2F400985EFC /* DataInputModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
