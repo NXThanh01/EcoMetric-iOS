@@ -9,10 +9,11 @@ import SwiftUI
 
 @main
 struct EcoMetricApp: App {
-    
+
     var body: some Scene {
-        
+
         WindowGroup {
+
             AppRootView()
         }
     }

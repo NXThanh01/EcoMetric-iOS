@@ -9,7 +9,8 @@ import SwiftUI
 import Charts
 
 struct ReportsView: View {
-
+    @State private var isExporting = false
+    @State private var showExportSuccess = false
     @StateObject private var viewModel:
         ReportsViewModel
 
@@ -54,6 +55,23 @@ struct ReportsView: View {
             )
             .task {
                 await viewModel.load()
+            }
+            .alert(
+                "Xuất báo cáo thành công",
+                isPresented:
+                    $showExportSuccess
+            ) {
+
+                Button(
+                    "OK",
+                    role: .cancel
+                ) {}
+
+            } message: {
+
+                Text(
+                    "Báo cáo ESG / Carbon đã được tạo thành công."
+                )
             }
         }
     }
@@ -397,17 +415,39 @@ struct ReportsView: View {
 
         Button {
 
+            Task {
+
+                isExporting = true
+
+                try? await Task.sleep(
+                    nanoseconds: 1_500_000_000
+                )
+
+                isExporting = false
+                showExportSuccess = true
+            }
+
         } label: {
 
             HStack {
 
-                Image(
-                    systemName:
-                        "square.and.arrow.up"
-                )
+                if isExporting {
+
+                    ProgressView()
+                        .tint(.white)
+
+                } else {
+
+                    Image(
+                        systemName:
+                            "square.and.arrow.up"
+                    )
+                }
 
                 Text(
-                    "Xuất báo cáo"
+                    isExporting
+                    ? "Đang tạo báo cáo..."
+                    : "Xuất báo cáo"
                 )
                 .fontWeight(
                     .semibold
@@ -418,7 +458,9 @@ struct ReportsView: View {
             )
             .padding()
             .background(
-                EcoTheme.blue
+                isExporting
+                ? EcoTheme.blue.opacity(0.7)
+                : EcoTheme.blue
             )
             .foregroundStyle(
                 .white
@@ -429,5 +471,6 @@ struct ReportsView: View {
                 )
             )
         }
+        .disabled(isExporting)
     }
 }

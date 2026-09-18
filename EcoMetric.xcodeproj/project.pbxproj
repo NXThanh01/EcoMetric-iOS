@@ -33,6 +33,7 @@
 		1B106759305DB55E00985EFC /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106758305DB55E00985EFC /* SplashView.swift */; };
 		1B10675B305DB57000985EFC /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10675A305DB57000985EFC /* AppRootView.swift */; };
 		1B10675D305DB60900985EFC /* AIAnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10675C305DB60900985EFC /* AIAnalysisView.swift */; };
+		1B10675F305DB79400985EFC /* EcoLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10675E305DB79400985EFC /* EcoLogo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +83,7 @@
 		1B106758305DB55E00985EFC /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		1B10675A305DB57000985EFC /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
 		1B10675C305DB60900985EFC /* AIAnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAnalysisView.swift; sourceTree = "<group>"; };
+		1B10675E305DB79400985EFC /* EcoLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoLogo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -227,6 +229,7 @@
 			isa = PBXGroup;
 			children = (
 				1B10672E305DAFD900985EFC /* EcoTheme.swift */,
+				1B10675E305DB79400985EFC /* EcoLogo.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -432,6 +435,7 @@
 				1B106743305DB1AA00985EFC /* DashboardViewModel.swift in Sources */,
 				1B10672F305DAFD900985EFC /* EcoTheme.swift in Sources */,
 				1B106757305DB4DE00985EFC /* ReportsViewModel.swift in Sources */,
+				1B10675F305DB79400985EFC /* EcoLogo.swift in Sources */,
 				1B106751305DB4AE00985EFC /* ReportModels.swift in Sources */,
 				1B106747305DB30500985EFC /* DataInputViewModel.swift in Sources */,
 				1B106733305DB05500985EFC /* DataInputView.swift in Sources */,

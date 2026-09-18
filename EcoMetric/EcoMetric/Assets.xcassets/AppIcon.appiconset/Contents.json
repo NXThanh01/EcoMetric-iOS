@@ -1,6 +1,7 @@
 {
   "images" : [
     {
+      "filename" : "LOGO ECOMETRIC V2.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -12,6 +13,7 @@
           "value" : "dark"
         }
       ],
+      "filename" : "LOGO ECOMETRIC DARK MODE.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"

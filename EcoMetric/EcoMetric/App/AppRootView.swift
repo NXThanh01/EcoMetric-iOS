@@ -9,8 +9,7 @@ import SwiftUI
 
 struct AppRootView: View {
 
-    @State private var showSplash =
-        true
+    @State private var showSplash = true
 
     var body: some View {
 
@@ -19,23 +18,18 @@ struct AppRootView: View {
             if showSplash {
 
                 SplashView()
-                    .transition(
-                        .opacity
-                    )
+                    .transition(.opacity)
 
             } else {
 
                 RootTabView()
-                    .transition(
-                        .opacity
-                    )
+                    .transition(.opacity)
             }
         }
         .task {
 
             try? await Task.sleep(
-                nanoseconds:
-                    1_600_000_000
+                nanoseconds: 1_800_000_000
             )
 
             withAnimation(
