@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct EcoMetricApp: App {
+    
     var body: some Scene {
+        
         WindowGroup {
-            Text("EcoMetric")
+            RootTabView()
         }
     }
 }

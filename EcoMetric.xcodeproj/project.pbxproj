@@ -9,6 +9,13 @@
 /* Begin PBXBuildFile section */
 		1B10671F305DABD200985EFC /* EcoMetricApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10671E305DABD200985EFC /* EcoMetricApp.swift */; };
 		1B106721305DAC7800985EFC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1B106720305DAC7800985EFC /* Assets.xcassets */; };
+		1B10672F305DAFD900985EFC /* EcoTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10672E305DAFD900985EFC /* EcoTheme.swift */; };
+		1B106731305DAFFC00985EFC /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106730305DAFFC00985EFC /* DashboardView.swift */; };
+		1B106733305DB05500985EFC /* DataInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106732305DB05500985EFC /* DataInputView.swift */; };
+		1B106735305DB06B00985EFC /* AIRecommendationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106734305DB06B00985EFC /* AIRecommendationsView.swift */; };
+		1B106737305DB08200985EFC /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106736305DB08200985EFC /* ReportsView.swift */; };
+		1B106739305DB09500985EFC /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106738305DB09500985EFC /* ProfileView.swift */; };
+		1B10673B305DB0A800985EFC /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10673A305DB0A800985EFC /* RootTabView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +41,13 @@
 		1B106708305DA7A400985EFC /* EcoMetricUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EcoMetricUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B10671E305DABD200985EFC /* EcoMetricApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoMetricApp.swift; sourceTree = "<group>"; };
 		1B106720305DAC7800985EFC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1B10672E305DAFD900985EFC /* EcoTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoTheme.swift; sourceTree = "<group>"; };
+		1B106730305DAFFC00985EFC /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		1B106732305DB05500985EFC /* DataInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataInputView.swift; sourceTree = "<group>"; };
+		1B106734305DB06B00985EFC /* AIRecommendationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIRecommendationsView.swift; sourceTree = "<group>"; };
+		1B106736305DB08200985EFC /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsView.swift; sourceTree = "<group>"; };
+		1B106738305DB09500985EFC /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		1B10673A305DB0A800985EFC /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -154,6 +168,7 @@
 				1B10672B305DACEC00985EFC /* AI */,
 				1B10672A305DACE500985EFC /* Data */,
 				1B106729305DACDD00985EFC /* Dashboard */,
+				1B10673A305DB0A800985EFC /* RootTabView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -161,6 +176,7 @@
 		1B106727305DACCB00985EFC /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				1B10672E305DAFD900985EFC /* EcoTheme.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -175,6 +191,7 @@
 		1B106729305DACDD00985EFC /* Dashboard */ = {
 			isa = PBXGroup;
 			children = (
+				1B106730305DAFFC00985EFC /* DashboardView.swift */,
 			);
 			path = Dashboard;
 			sourceTree = "<group>";
@@ -182,6 +199,7 @@
 		1B10672A305DACE500985EFC /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				1B106732305DB05500985EFC /* DataInputView.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -189,6 +207,7 @@
 		1B10672B305DACEC00985EFC /* AI */ = {
 			isa = PBXGroup;
 			children = (
+				1B106734305DB06B00985EFC /* AIRecommendationsView.swift */,
 			);
 			path = AI;
 			sourceTree = "<group>";
@@ -196,6 +215,7 @@
 		1B10672C305DACF000985EFC /* Reports */ = {
 			isa = PBXGroup;
 			children = (
+				1B106736305DB08200985EFC /* ReportsView.swift */,
 			);
 			path = Reports;
 			sourceTree = "<group>";
@@ -203,6 +223,7 @@
 		1B10672D305DACF600985EFC /* Profile */ = {
 			isa = PBXGroup;
 			children = (
+				1B106738305DB09500985EFC /* ProfileView.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -351,6 +372,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				1B10671F305DABD200985EFC /* EcoMetricApp.swift in Sources */,
+				1B106731305DAFFC00985EFC /* DashboardView.swift in Sources */,
+				1B10673B305DB0A800985EFC /* RootTabView.swift in Sources */,
+				1B10672F305DAFD900985EFC /* EcoTheme.swift in Sources */,
+				1B106733305DB05500985EFC /* DataInputView.swift in Sources */,
+				1B106737305DB08200985EFC /* ReportsView.swift in Sources */,
+				1B106739305DB09500985EFC /* ProfileView.swift in Sources */,
+				1B106735305DB06B00985EFC /* AIRecommendationsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
