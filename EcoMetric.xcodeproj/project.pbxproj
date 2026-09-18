@@ -6,36 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		1B10671F305DABD200985EFC /* EcoMetricApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10671E305DABD200985EFC /* EcoMetricApp.swift */; };
-		1B106721305DAC7800985EFC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1B106720305DAC7800985EFC /* Assets.xcassets */; };
-		1B10672F305DAFD900985EFC /* EcoTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10672E305DAFD900985EFC /* EcoTheme.swift */; };
-		1B106731305DAFFC00985EFC /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106730305DAFFC00985EFC /* DashboardView.swift */; };
-		1B106733305DB05500985EFC /* DataInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106732305DB05500985EFC /* DataInputView.swift */; };
-		1B106735305DB06B00985EFC /* AIRecommendationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106734305DB06B00985EFC /* AIRecommendationsView.swift */; };
-		1B106737305DB08200985EFC /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106736305DB08200985EFC /* ReportsView.swift */; };
-		1B106739305DB09500985EFC /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106738305DB09500985EFC /* ProfileView.swift */; };
-		1B10673B305DB0A800985EFC /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10673A305DB0A800985EFC /* RootTabView.swift */; };
-		1B10673D305DB17500985EFC /* DashboardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10673C305DB17500985EFC /* DashboardModels.swift */; };
-		1B10673F305DB18700985EFC /* DashboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10673E305DB18700985EFC /* DashboardService.swift */; };
-		1B106741305DB19600985EFC /* MockDashboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106740305DB19600985EFC /* MockDashboardService.swift */; };
-		1B106743305DB1AA00985EFC /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106742305DB1AA00985EFC /* DashboardViewModel.swift */; };
-		1B106745305DB2F400985EFC /* DataInputModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106744305DB2F400985EFC /* DataInputModels.swift */; };
-		1B106747305DB30500985EFC /* DataInputViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106746305DB30500985EFC /* DataInputViewModel.swift */; };
-		1B106749305DB3FA00985EFC /* AIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106748305DB3FA00985EFC /* AIModels.swift */; };
-		1B10674B305DB40B00985EFC /* AIRecommendationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10674A305DB40B00985EFC /* AIRecommendationService.swift */; };
-		1B10674D305DB41A00985EFC /* MockAIRecommendationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10674C305DB41A00985EFC /* MockAIRecommendationService.swift */; };
-		1B10674F305DB42A00985EFC /* AIRecommendationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10674E305DB42A00985EFC /* AIRecommendationsViewModel.swift */; };
-		1B106751305DB4AE00985EFC /* ReportModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106750305DB4AE00985EFC /* ReportModels.swift */; };
-		1B106753305DB4BF00985EFC /* ReportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106752305DB4BF00985EFC /* ReportService.swift */; };
-		1B106755305DB4CF00985EFC /* MockReportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106754305DB4CF00985EFC /* MockReportService.swift */; };
-		1B106757305DB4DE00985EFC /* ReportsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106756305DB4DE00985EFC /* ReportsViewModel.swift */; };
-		1B106759305DB55E00985EFC /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B106758305DB55E00985EFC /* SplashView.swift */; };
-		1B10675B305DB57000985EFC /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10675A305DB57000985EFC /* AppRootView.swift */; };
-		1B10675D305DB60900985EFC /* AIAnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10675C305DB60900985EFC /* AIAnalysisView.swift */; };
-		1B10675F305DB79400985EFC /* EcoLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10675E305DB79400985EFC /* EcoLogo.swift */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		1B1066FF305DA7A400985EFC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -57,36 +27,14 @@
 		1B1066F1305DA7A300985EFC /* EcoMetric.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EcoMetric.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B1066FE305DA7A400985EFC /* EcoMetricTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EcoMetricTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B106708305DA7A400985EFC /* EcoMetricUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EcoMetricUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		1B10671E305DABD200985EFC /* EcoMetricApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoMetricApp.swift; sourceTree = "<group>"; };
-		1B106720305DAC7800985EFC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		1B10672E305DAFD900985EFC /* EcoTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoTheme.swift; sourceTree = "<group>"; };
-		1B106730305DAFFC00985EFC /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
-		1B106732305DB05500985EFC /* DataInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataInputView.swift; sourceTree = "<group>"; };
-		1B106734305DB06B00985EFC /* AIRecommendationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIRecommendationsView.swift; sourceTree = "<group>"; };
-		1B106736305DB08200985EFC /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsView.swift; sourceTree = "<group>"; };
-		1B106738305DB09500985EFC /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
-		1B10673A305DB0A800985EFC /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
-		1B10673C305DB17500985EFC /* DashboardModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardModels.swift; sourceTree = "<group>"; };
-		1B10673E305DB18700985EFC /* DashboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardService.swift; sourceTree = "<group>"; };
-		1B106740305DB19600985EFC /* MockDashboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDashboardService.swift; sourceTree = "<group>"; };
-		1B106742305DB1AA00985EFC /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
-		1B106744305DB2F400985EFC /* DataInputModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataInputModels.swift; sourceTree = "<group>"; };
-		1B106746305DB30500985EFC /* DataInputViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataInputViewModel.swift; sourceTree = "<group>"; };
-		1B106748305DB3FA00985EFC /* AIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIModels.swift; sourceTree = "<group>"; };
-		1B10674A305DB40B00985EFC /* AIRecommendationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIRecommendationService.swift; sourceTree = "<group>"; };
-		1B10674C305DB41A00985EFC /* MockAIRecommendationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAIRecommendationService.swift; sourceTree = "<group>"; };
-		1B10674E305DB42A00985EFC /* AIRecommendationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIRecommendationsViewModel.swift; sourceTree = "<group>"; };
-		1B106750305DB4AE00985EFC /* ReportModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportModels.swift; sourceTree = "<group>"; };
-		1B106752305DB4BF00985EFC /* ReportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportService.swift; sourceTree = "<group>"; };
-		1B106754305DB4CF00985EFC /* MockReportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockReportService.swift; sourceTree = "<group>"; };
-		1B106756305DB4DE00985EFC /* ReportsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsViewModel.swift; sourceTree = "<group>"; };
-		1B106758305DB55E00985EFC /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
-		1B10675A305DB57000985EFC /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
-		1B10675C305DB60900985EFC /* AIAnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAnalysisView.swift; sourceTree = "<group>"; };
-		1B10675E305DB79400985EFC /* EcoLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoLogo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		1B1066F3305DA7A300985EFC /* EcoMetric */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = EcoMetric;
+			sourceTree = "<group>";
+		};
 		1B106701305DA7A400985EFC /* EcoMetricTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = EcoMetricTests;
@@ -127,7 +75,7 @@
 		1B1066E8305DA7A300985EFC = {
 			isa = PBXGroup;
 			children = (
-				1B10671C305DAA1D00985EFC /* EcoMetric */,
+				1B1066F3305DA7A300985EFC /* EcoMetric */,
 				1B106701305DA7A400985EFC /* EcoMetricTests */,
 				1B10670B305DA7A400985EFC /* EcoMetricUITests */,
 				1B1066F2305DA7A300985EFC /* Products */,
@@ -144,144 +92,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		1B10671C305DAA1D00985EFC /* EcoMetric */ = {
-			isa = PBXGroup;
-			children = (
-				1B10671D305DAA5400985EFC /* EcoMetric */,
-			);
-			path = EcoMetric;
-			sourceTree = "<group>";
-		};
-		1B10671D305DAA5400985EFC /* EcoMetric */ = {
-			isa = PBXGroup;
-			children = (
-				1B106728305DACD700985EFC /* Resources */,
-				1B106727305DACCB00985EFC /* Components */,
-				1B106726305DACC500985EFC /* Views */,
-				1B106725305DACBE00985EFC /* ViewModels */,
-				1B106724305DACB500985EFC /* Services */,
-				1B106723305DACAF00985EFC /* Models */,
-				1B106722305DACA700985EFC /* App */,
-				1B106720305DAC7800985EFC /* Assets.xcassets */,
-			);
-			path = EcoMetric;
-			sourceTree = "<group>";
-		};
-		1B106722305DACA700985EFC /* App */ = {
-			isa = PBXGroup;
-			children = (
-				1B10671E305DABD200985EFC /* EcoMetricApp.swift */,
-				1B10675A305DB57000985EFC /* AppRootView.swift */,
-			);
-			path = App;
-			sourceTree = "<group>";
-		};
-		1B106723305DACAF00985EFC /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				1B10673C305DB17500985EFC /* DashboardModels.swift */,
-				1B106744305DB2F400985EFC /* DataInputModels.swift */,
-				1B106748305DB3FA00985EFC /* AIModels.swift */,
-				1B106750305DB4AE00985EFC /* ReportModels.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		1B106724305DACB500985EFC /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				1B10673E305DB18700985EFC /* DashboardService.swift */,
-				1B106740305DB19600985EFC /* MockDashboardService.swift */,
-				1B10674A305DB40B00985EFC /* AIRecommendationService.swift */,
-				1B10674C305DB41A00985EFC /* MockAIRecommendationService.swift */,
-				1B106752305DB4BF00985EFC /* ReportService.swift */,
-				1B106754305DB4CF00985EFC /* MockReportService.swift */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
-		1B106725305DACBE00985EFC /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-				1B106742305DB1AA00985EFC /* DashboardViewModel.swift */,
-				1B106746305DB30500985EFC /* DataInputViewModel.swift */,
-				1B10674E305DB42A00985EFC /* AIRecommendationsViewModel.swift */,
-				1B106756305DB4DE00985EFC /* ReportsViewModel.swift */,
-			);
-			path = ViewModels;
-			sourceTree = "<group>";
-		};
-		1B106726305DACC500985EFC /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				1B10672D305DACF600985EFC /* Profile */,
-				1B10672C305DACF000985EFC /* Reports */,
-				1B10672B305DACEC00985EFC /* AI */,
-				1B10672A305DACE500985EFC /* Data */,
-				1B106729305DACDD00985EFC /* Dashboard */,
-				1B10673A305DB0A800985EFC /* RootTabView.swift */,
-				1B106758305DB55E00985EFC /* SplashView.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		1B106727305DACCB00985EFC /* Components */ = {
-			isa = PBXGroup;
-			children = (
-				1B10672E305DAFD900985EFC /* EcoTheme.swift */,
-				1B10675E305DB79400985EFC /* EcoLogo.swift */,
-			);
-			path = Components;
-			sourceTree = "<group>";
-		};
-		1B106728305DACD700985EFC /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		1B106729305DACDD00985EFC /* Dashboard */ = {
-			isa = PBXGroup;
-			children = (
-				1B106730305DAFFC00985EFC /* DashboardView.swift */,
-			);
-			path = Dashboard;
-			sourceTree = "<group>";
-		};
-		1B10672A305DACE500985EFC /* Data */ = {
-			isa = PBXGroup;
-			children = (
-				1B106732305DB05500985EFC /* DataInputView.swift */,
-			);
-			path = Data;
-			sourceTree = "<group>";
-		};
-		1B10672B305DACEC00985EFC /* AI */ = {
-			isa = PBXGroup;
-			children = (
-				1B106734305DB06B00985EFC /* AIRecommendationsView.swift */,
-				1B10675C305DB60900985EFC /* AIAnalysisView.swift */,
-			);
-			path = AI;
-			sourceTree = "<group>";
-		};
-		1B10672C305DACF000985EFC /* Reports */ = {
-			isa = PBXGroup;
-			children = (
-				1B106736305DB08200985EFC /* ReportsView.swift */,
-			);
-			path = Reports;
-			sourceTree = "<group>";
-		};
-		1B10672D305DACF600985EFC /* Profile */ = {
-			isa = PBXGroup;
-			children = (
-				1B106738305DB09500985EFC /* ProfileView.swift */,
-			);
-			path = Profile;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -296,6 +106,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				1B1066F3305DA7A300985EFC /* EcoMetric */,
 			);
 			name = EcoMetric;
 			packageProductDependencies = (
@@ -362,7 +175,6 @@
 				TargetAttributes = {
 					1B1066F0305DA7A300985EFC = {
 						CreatedOnToolsVersion = 26.1.1;
-						LastSwiftMigration = 2610;
 					};
 					1B1066FD305DA7A400985EFC = {
 						CreatedOnToolsVersion = 26.1.1;
@@ -400,7 +212,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1B106721305DAC7800985EFC /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -425,32 +236,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1B10674F305DB42A00985EFC /* AIRecommendationsViewModel.swift in Sources */,
-				1B10671F305DABD200985EFC /* EcoMetricApp.swift in Sources */,
-				1B106731305DAFFC00985EFC /* DashboardView.swift in Sources */,
-				1B106753305DB4BF00985EFC /* ReportService.swift in Sources */,
-				1B10675B305DB57000985EFC /* AppRootView.swift in Sources */,
-				1B10674D305DB41A00985EFC /* MockAIRecommendationService.swift in Sources */,
-				1B10673B305DB0A800985EFC /* RootTabView.swift in Sources */,
-				1B106743305DB1AA00985EFC /* DashboardViewModel.swift in Sources */,
-				1B10672F305DAFD900985EFC /* EcoTheme.swift in Sources */,
-				1B106757305DB4DE00985EFC /* ReportsViewModel.swift in Sources */,
-				1B10675F305DB79400985EFC /* EcoLogo.swift in Sources */,
-				1B106751305DB4AE00985EFC /* ReportModels.swift in Sources */,
-				1B106747305DB30500985EFC /* DataInputViewModel.swift in Sources */,
-				1B106733305DB05500985EFC /* DataInputView.swift in Sources */,
-				1B10673D305DB17500985EFC /* DashboardModels.swift in Sources */,
-				1B10674B305DB40B00985EFC /* AIRecommendationService.swift in Sources */,
-				1B106737305DB08200985EFC /* ReportsView.swift in Sources */,
-				1B106749305DB3FA00985EFC /* AIModels.swift in Sources */,
-				1B106741305DB19600985EFC /* MockDashboardService.swift in Sources */,
-				1B106759305DB55E00985EFC /* SplashView.swift in Sources */,
-				1B106739305DB09500985EFC /* ProfileView.swift in Sources */,
-				1B10673F305DB18700985EFC /* DashboardService.swift in Sources */,
-				1B106755305DB4CF00985EFC /* MockReportService.swift in Sources */,
-				1B10675D305DB60900985EFC /* AIAnalysisView.swift in Sources */,
-				1B106735305DB06B00985EFC /* AIRecommendationsView.swift in Sources */,
-				1B106745305DB2F400985EFC /* DataInputModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -610,8 +395,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9968U4M6WZ;
@@ -633,7 +416,6 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -645,8 +427,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9968U4M6WZ;
