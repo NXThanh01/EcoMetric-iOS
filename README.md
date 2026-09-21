@@ -50,6 +50,10 @@ AI Recommendations
 Báo cáo ESG / Carbon
 Export Report Simulation
 Business Profile
+
+## Trạng thái dự án
+
+
 Demo Workflow
 Launch
   ↓
