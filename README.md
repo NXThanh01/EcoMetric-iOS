@@ -51,9 +51,6 @@ Báo cáo ESG / Carbon
 Export Report Simulation
 Business Profile
 
-## Trạng thái dự án
-
-
 Demo Workflow
 Launch
   ↓
@@ -115,63 +112,7 @@ EcoMetric/
 │   └── Profile/
 ├── Components/
 └── Assets.xcassets/
-Tech Stack
-Swift
-SwiftUI
-Swift Charts
-Combine
-Xcode
-Git
-GitHub
-Development Workflow
-Requirement
-   ↓
-Design
-   ↓
-Code
-   ↓
-Build
-   ↓
-Test
-   ↓
-Commit
-   ↓
-Push
 
-Workflow Git:
-
-git pull
-git status
-git add .
-git commit -m "feat: implement feature"
-git push
-
-Commit convention:
-
-feat: add feature
-fix: fix bug
-style: improve UI
-docs: update documentation
-chore: update configuration
-refactor: improve architecture
-Run Project
-
-Clone:
-
-git clone git@github.com:NXThanh01/EcoMetric-iOS.git
-
-Open:
-
-cd EcoMetric-iOS
-open EcoMetric.xcodeproj
-
-Build:
-
-Command + B
-
-Run:
-
-Command + R
 Roadmap
 Prototype
  Dashboard
@@ -273,9 +214,3 @@ Public access to this repository does not grant permission to copy, modify, redi
 Copyright © 2026 Nguyễn Xuân Thành.
 All Rights Reserved.
 
-Sau khi dán xong:
-
-```bash
-git add README.md
-git commit -m "docs: add bilingual project README"
-git push
