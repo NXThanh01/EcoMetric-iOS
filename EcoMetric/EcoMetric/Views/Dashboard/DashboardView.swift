@@ -13,7 +13,20 @@ struct DashboardView: View {
     let onOpenAI: () -> Void
 
     @State private var appeared = false
+
     @StateObject private var viewModel: DashboardViewModel
+
+    // MARK: - Energy Case
+
+    private let energyInput =
+        EnergyCaseInput.workshop1LEDCase
+
+    private var energyResult: EnergyCaseResult {
+        EnergyCalculationService()
+            .calculate(
+                input: energyInput
+            )
+    }
 
     init(
         onOpenAI: @escaping () -> Void = {}
@@ -22,9 +35,11 @@ struct DashboardView: View {
         self.onOpenAI = onOpenAI
 
         _viewModel = StateObject(
-            wrappedValue: DashboardViewModel(
-                service: MockDashboardService()
-            )
+            wrappedValue:
+                DashboardViewModel(
+                    service:
+                        MockDashboardService()
+                )
         )
     }
 
@@ -39,17 +54,24 @@ struct DashboardView: View {
 
                 if viewModel.isLoading {
 
-                    ProgressView("Đang tải dữ liệu...")
+                    ProgressView(
+                        "Đang tải dữ liệu..."
+                    )
 
                 } else {
 
                     ScrollView {
 
-                        VStack(spacing: 20) {
+                        VStack(
+                            spacing: 20
+                        ) {
 
                             header
 
-                            if let data = viewModel.dashboard {
+                            demoDataBadge
+
+                            if let data =
+                                viewModel.dashboard {
 
                                 mainEmissionCard(
                                     data.metrics
@@ -59,8 +81,7 @@ struct DashboardView: View {
                                     data.metrics
                                 )
 
-                                // AI INSIGHT CARD
-                                aiTeaserCard
+                                prioritySection
 
                                 emissionChart(
                                     data.emissionTrend
@@ -75,7 +96,10 @@ struct DashboardView: View {
                             appeared ? 1 : 0
                         )
                         .offset(
-                            y: appeared ? 0 : 18
+                            y:
+                                appeared
+                                ? 0
+                                : 18
                         )
                         .animation(
                             .easeOut(
@@ -95,10 +119,16 @@ struct DashboardView: View {
             }
         }
     }
+}
 
-    // MARK: - HEADER
 
-    private var header: some View {
+// ======================================================
+// MARK: - HEADER
+// ======================================================
+
+private extension DashboardView {
+
+    var header: some View {
 
         VStack(
             alignment: .leading,
@@ -123,14 +153,17 @@ struct DashboardView: View {
                         )
 
                     Image(
-                        systemName: "bell.fill"
+                        systemName:
+                            "bell.fill"
                     )
                     .foregroundStyle(
                         EcoTheme.blue
                     )
 
                     Circle()
-                        .fill(Color.red)
+                        .fill(
+                            Color.red
+                        )
                         .frame(
                             width: 8,
                             height: 8
@@ -165,10 +198,78 @@ struct DashboardView: View {
             }
         }
     }
+}
 
-    // MARK: - MAIN EMISSION CARD
 
-    private func mainEmissionCard(
+// ======================================================
+// MARK: - DEMO DATA
+// ======================================================
+
+private extension DashboardView {
+
+    var demoDataBadge: some View {
+
+        HStack(
+            spacing: 8
+        ) {
+
+            Image(
+                systemName:
+                    "info.circle.fill"
+            )
+
+            Text(
+                "Dữ liệu minh họa"
+            )
+            .font(
+                .caption.bold()
+            )
+
+            Spacer()
+
+            Text("MVP")
+                .font(
+                    .caption2.bold()
+                )
+                .padding(
+                    .horizontal,
+                    8
+                )
+                .padding(
+                    .vertical,
+                    4
+                )
+                .background(
+                    Color.white
+                        .opacity(0.8)
+                )
+                .clipShape(
+                    Capsule()
+                )
+        }
+        .foregroundStyle(
+            EcoTheme.darkGreen
+        )
+        .padding()
+        .background(
+            EcoTheme.lightGreen
+        )
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: 16
+            )
+        )
+    }
+}
+
+
+// ======================================================
+// MARK: - MAIN EMISSION CARD
+// ======================================================
+
+private extension DashboardView {
+
+    func mainEmissionCard(
         _ metric: DashboardMetric
     ) -> some View {
 
@@ -193,7 +294,8 @@ struct DashboardView: View {
                     )
 
                     Image(
-                        systemName: "leaf.fill"
+                        systemName:
+                            "leaf.fill"
                     )
                     .font(.title2)
                     .foregroundStyle(
@@ -215,7 +317,8 @@ struct DashboardView: View {
                     )
 
                     HStack(
-                        alignment: .lastTextBaseline,
+                        alignment:
+                            .lastTextBaseline,
                         spacing: 5
                     ) {
 
@@ -233,7 +336,9 @@ struct DashboardView: View {
                         )
 
                         Text("tấn")
-                            .font(.caption)
+                            .font(
+                                .caption
+                            )
                             .foregroundStyle(
                                 .secondary
                             )
@@ -250,7 +355,9 @@ struct DashboardView: View {
                     Text(
                         "\(metric.emissionChange, specifier: "%.1f")%"
                     )
-                    .font(.caption.bold())
+                    .font(
+                        .caption.bold()
+                    )
                     .foregroundStyle(
                         EcoTheme.green
                     )
@@ -285,7 +392,8 @@ struct DashboardView: View {
 
                 Label(
                     "Dữ liệu cập nhật",
-                    systemImage: "clock.fill"
+                    systemImage:
+                        "clock.fill"
                 )
                 .font(.caption2)
                 .foregroundStyle(
@@ -295,7 +403,9 @@ struct DashboardView: View {
                 Spacer()
 
                 Text("Hôm nay")
-                    .font(.caption2.bold())
+                    .font(
+                        .caption2.bold()
+                    )
                     .foregroundStyle(
                         EcoTheme.navy
                     )
@@ -309,8 +419,10 @@ struct DashboardView: View {
                     EcoTheme.lightGreen
                         .opacity(0.45)
                 ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
+                startPoint:
+                    .topLeading,
+                endPoint:
+                    .bottomTrailing
             )
         )
         .clipShape(
@@ -319,41 +431,57 @@ struct DashboardView: View {
             )
         )
         .shadow(
-            color: .black.opacity(0.05),
+            color:
+                .black.opacity(0.05),
             radius: 12,
             y: 5
         )
     }
+}
 
-    // MARK: - METRIC CARDS
 
-    private func metricCards(
+// ======================================================
+// MARK: - METRIC CARDS
+// ======================================================
+
+private extension DashboardView {
+
+    func metricCards(
         _ metric: DashboardMetric
     ) -> some View {
 
-        HStack(spacing: 12) {
+        HStack(
+            spacing: 12
+        ) {
 
             metricCard(
-                title: "Chi phí vận hành",
-                value: "\(Int(metric.operatingCost / 1_000_000))M",
-                subtitle: "VNĐ",
-                icon: "banknote.fill"
+                title:
+                    "Chi phí vận hành",
+                value:
+                    "\(Int(metric.operatingCost / 1_000_000))M",
+                subtitle:
+                    "VNĐ",
+                icon:
+                    "banknote.fill"
             )
 
             metricCard(
-                title: "Tiết kiệm tiềm năng",
-                value: metric.potentialSaving.formatted(
-                    .number.precision(
-                        .fractionLength(1)
-                    )
-                ),
-                subtitle: "tấn CO₂e/năm",
-                icon: "leaf.circle.fill"
+                title:
+                    "Tiết kiệm case ưu tiên",
+                value:
+                    moneyShort(
+                        energyResult
+                            .costSavingVNDPerYear
+                    ),
+                subtitle:
+                    "VNĐ/năm",
+                icon:
+                    "chart.line.uptrend.xyaxis"
             )
         }
     }
 
-    private func metricCard(
+    func metricCard(
         title: String,
         value: String,
         subtitle: String,
@@ -386,6 +514,10 @@ struct DashboardView: View {
                 .foregroundStyle(
                     EcoTheme.navy
                 )
+                .lineLimit(1)
+                .minimumScaleFactor(
+                    0.7
+                )
 
             Text(subtitle)
                 .font(.caption2)
@@ -399,7 +531,7 @@ struct DashboardView: View {
         )
         .padding()
         .background(
-            .white
+            Color.white
         )
         .clipShape(
             RoundedRectangle(
@@ -407,88 +539,429 @@ struct DashboardView: View {
             )
         )
         .shadow(
-            color: .black.opacity(0.04),
+            color:
+                .black.opacity(0.04),
             radius: 8,
             y: 3
         )
     }
+}
 
-    // MARK: - AI INSIGHT CARD
 
-    private var aiTeaserCard: some View {
+// ======================================================
+// MARK: - 3 PRIORITIES
+// ======================================================
 
-        Button {
+private extension DashboardView {
 
-            onOpenAI()
+    var prioritySection: some View {
 
-        } label: {
+        VStack(
+            alignment: .leading,
+            spacing: 14
+        ) {
 
             HStack(
-                spacing: 14
+                alignment: .top
             ) {
-
-                ZStack {
-
-                    Circle()
-                        .fill(
-                            EcoTheme.lightBlue
-                        )
-                        .frame(
-                            width: 48,
-                            height: 48
-                        )
-
-                    Image(
-                        systemName: "sparkles"
-                    )
-                    .font(.title3)
-                    .foregroundStyle(
-                        EcoTheme.blue
-                    )
-                }
 
                 VStack(
                     alignment: .leading,
                     spacing: 4
                 ) {
 
-                    HStack(spacing: 6) {
-
-                        Text("AI Insight")
-                            .font(.headline)
-                            .foregroundStyle(
-                                EcoTheme.navy
-                            )
-
-                        Text("MỚI")
-                            .font(
-                                .system(
-                                    size: 9,
-                                    weight: .bold
-                                )
-                            )
-                            .foregroundStyle(
-                                EcoTheme.green
-                            )
-                            .padding(
-                                .horizontal,
-                                6
-                            )
-                            .padding(
-                                .vertical,
-                                3
-                            )
-                            .background(
-                                EcoTheme.lightGreen
-                            )
-                            .clipShape(
-                                Capsule()
-                            )
-                    }
+                    Text(
+                        "3 việc cần làm"
+                    )
+                    .font(
+                        .title2.bold()
+                    )
+                    .foregroundStyle(
+                        EcoTheme.navy
+                    )
 
                     Text(
-                        "Phát hiện tiềm năng giảm 12% phát thải điện năng."
+                        "Các ưu tiên hành động trong tháng này"
                     )
+                    .font(.caption)
+                    .foregroundStyle(
+                        .secondary
+                    )
+                }
+
+                Spacer()
+
+                Image(
+                    systemName:
+                        "target"
+                )
+                .font(.title2)
+                .foregroundStyle(
+                    EcoTheme.green
+                )
+            }
+
+            prioritySummaryCard
+
+            NavigationLink {
+
+                EnergySolutionDetailView(
+                    input:
+                        energyInput,
+                    result:
+                        energyResult
+                )
+
+            } label: {
+
+                priorityCard(
+                    number: "01",
+                    title:
+                        "Giảm điện năng tại Xưởng 1",
+                    subtitle:
+                        "Thay 100 bóng 40W bằng LED 18W",
+                    impact:
+                        "\(moneyShort(energyResult.costSavingVNDPerMonth))/tháng",
+                    status:
+                        "Ưu tiên cao",
+                    color:
+                        EcoTheme.green,
+                    icon:
+                        "bolt.fill",
+                    showChevron:
+                        true
+                )
+            }
+            .buttonStyle(.plain)
+
+            Button {
+
+                onOpenAI()
+
+            } label: {
+
+                priorityCard(
+                    number: "02",
+                    title:
+                        "Tối ưu vận hành lò hơi",
+                    subtitle:
+                        "Phân tích thời gian vận hành và tải tiêu thụ",
+                    impact:
+                        "Đang phân tích",
+                    status:
+                        "Đang đánh giá",
+                    color:
+                        .orange,
+                    icon:
+                        "flame.fill",
+                    showChevron:
+                        true
+                )
+            }
+            .buttonStyle(.plain)
+
+            Button {
+
+                onOpenAI()
+
+            } label: {
+
+                priorityCard(
+                    number: "03",
+                    title:
+                        "Giảm thất thoát nước",
+                    subtitle:
+                        "Kiểm tra mức tiêu thụ bất thường",
+                    impact:
+                        "Đang phân tích",
+                    status:
+                        "Đang đánh giá",
+                    color:
+                        EcoTheme.blue,
+                    icon:
+                        "drop.fill",
+                    showChevron:
+                        true
+                )
+            }
+            .buttonStyle(.plain)
+        }
+    }
+}
+
+
+// ======================================================
+// MARK: - PRIORITY SUMMARY
+// ======================================================
+
+private extension DashboardView {
+
+    var prioritySummaryCard: some View {
+
+        VStack(
+            alignment: .leading,
+            spacing: 12
+        ) {
+
+            HStack {
+
+                ZStack {
+
+                    Circle()
+                        .fill(
+                            EcoTheme.lightGreen
+                        )
+                        .frame(
+                            width: 44,
+                            height: 44
+                        )
+
+                    Image(
+                        systemName:
+                            "sparkles"
+                    )
+                    .foregroundStyle(
+                        EcoTheme.green
+                    )
+                }
+
+                VStack(
+                    alignment: .leading,
+                    spacing: 3
+                ) {
+
+                    Text(
+                        "Tác động có thể tạo ra"
+                    )
+                    .font(
+                        .caption
+                    )
+                    .foregroundStyle(
+                        .secondary
+                    )
+
+                    Text(
+                        "Tập trung vào ưu tiên 01"
+                    )
+                    .font(
+                        .headline
+                    )
+                    .foregroundStyle(
+                        EcoTheme.navy
+                    )
+                }
+
+                Spacer()
+            }
+
+            Divider()
+
+            HStack(
+                spacing: 12
+            ) {
+
+                summaryMetric(
+                    icon:
+                        "dollarsign.circle.fill",
+                    title:
+                        "Tiết kiệm",
+                    value:
+                        "\(moneyShort(energyResult.costSavingVNDPerYear))/năm"
+                )
+
+                summaryMetric(
+                    icon:
+                        "clock.fill",
+                    title:
+                        "Hoàn vốn",
+                    value:
+                        "\(energyResult.paybackMonths.formatted(.number.precision(.fractionLength(1)))) tháng"
+                )
+            }
+
+            HStack(
+                spacing: 8
+            ) {
+
+                Image(
+                    systemName:
+                        "leaf.fill"
+                )
+                .foregroundStyle(
+                    EcoTheme.green
+                )
+
+                if let co2 =
+                    energyResult
+                        .co2SavingTonPerYear {
+
+                    Text(
+                        "CO₂e giảm dự kiến: \(co2.formatted(.number.precision(.fractionLength(2)))) tCO₂e/năm"
+                    )
+
+                } else {
+
+                    Text(
+                        "CO₂e sẽ được tính sau khi xác nhận hệ số phát thải điện."
+                    )
+                }
+            }
+            .font(.caption)
+            .foregroundStyle(
+                EcoTheme.darkGreen
+            )
+        }
+        .padding()
+        .background(
+            LinearGradient(
+                colors: [
+                    EcoTheme.lightGreen,
+                    Color.white
+                ],
+                startPoint:
+                    .topLeading,
+                endPoint:
+                    .bottomTrailing
+            )
+        )
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: 20
+            )
+        )
+    }
+
+    func summaryMetric(
+        icon: String,
+        title: String,
+        value: String
+    ) -> some View {
+
+        HStack(
+            spacing: 8
+        ) {
+
+            Image(
+                systemName: icon
+            )
+            .foregroundStyle(
+                EcoTheme.green
+            )
+
+            VStack(
+                alignment: .leading,
+                spacing: 2
+            ) {
+
+                Text(title)
+                    .font(
+                        .caption2
+                    )
+                    .foregroundStyle(
+                        .secondary
+                    )
+
+                Text(value)
+                    .font(
+                        .caption.bold()
+                    )
+                    .foregroundStyle(
+                        EcoTheme.navy
+                    )
+            }
+
+            Spacer()
+        }
+        .frame(
+            maxWidth: .infinity
+        )
+        .padding(10)
+        .background(
+            Color.white
+                .opacity(0.8)
+        )
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: 12
+            )
+        )
+    }
+}
+
+
+// ======================================================
+// MARK: - PRIORITY CARD
+// ======================================================
+
+private extension DashboardView {
+
+    func priorityCard(
+        number: String,
+        title: String,
+        subtitle: String,
+        impact: String,
+        status: String,
+        color: Color,
+        icon: String,
+        showChevron: Bool
+    ) -> some View {
+
+        HStack(
+            alignment: .top,
+            spacing: 12
+        ) {
+
+            ZStack {
+
+                RoundedRectangle(
+                    cornerRadius: 14
+                )
+                .fill(
+                    color.opacity(0.12)
+                )
+                .frame(
+                    width: 52,
+                    height: 52
+                )
+
+                VStack(
+                    spacing: 1
+                ) {
+
+                    Image(
+                        systemName: icon
+                    )
+                    .foregroundStyle(
+                        color
+                    )
+
+                    Text(number)
+                        .font(
+                            .system(
+                                size: 9,
+                                weight: .bold
+                            )
+                        )
+                        .foregroundStyle(
+                            color
+                        )
+                }
+            }
+
+            VStack(
+                alignment: .leading,
+                spacing: 6
+            ) {
+
+                Text(title)
+                    .font(
+                        .subheadline.bold()
+                    )
+                    .foregroundStyle(
+                        EcoTheme.navy
+                    )
+
+                Text(subtitle)
                     .font(.caption)
                     .foregroundStyle(
                         .secondary
@@ -496,50 +969,89 @@ struct DashboardView: View {
                     .multilineTextAlignment(
                         .leading
                     )
-                }
 
-                Spacer()
+                HStack(
+                    spacing: 7
+                ) {
+
+                    Text(status)
+                        .font(
+                            .caption2.bold()
+                        )
+                        .foregroundStyle(
+                            color
+                        )
+                        .padding(
+                            .horizontal,
+                            8
+                        )
+                        .padding(
+                            .vertical,
+                            4
+                        )
+                        .background(
+                            color.opacity(
+                                0.10
+                            )
+                        )
+                        .clipShape(
+                            Capsule()
+                        )
+
+                    Text(impact)
+                        .font(
+                            .caption2.bold()
+                        )
+                        .foregroundStyle(
+                            EcoTheme.navy
+                        )
+                }
+            }
+
+            Spacer()
+
+            if showChevron {
 
                 Image(
-                    systemName: "chevron.right"
+                    systemName:
+                        "chevron.right"
                 )
                 .font(.caption.bold())
                 .foregroundStyle(
-                    EcoTheme.blue
+                    .secondary
                 )
-            }
-            .padding()
-            .background(
-                LinearGradient(
-                    colors: [
-                        EcoTheme.lightBlue,
-                        Color.white
-                    ],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
-            .clipShape(
-                RoundedRectangle(
-                    cornerRadius: 18
-                )
-            )
-            .overlay {
-
-                RoundedRectangle(
-                    cornerRadius: 18
-                )
-                .stroke(
-                    EcoTheme.blue.opacity(0.08),
-                    lineWidth: 1
+                .padding(
+                    .top,
+                    4
                 )
             }
         }
-        .buttonStyle(.plain)
+        .padding()
+        .background(
+            Color.white
+        )
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: 18
+            )
+        )
+        .shadow(
+            color:
+                .black.opacity(0.035),
+            radius: 7,
+            y: 3
+        )
     }
-    // MARK: - EMISSION CHART
+}
 
-    private func emissionChart(
+
+// ======================================================
+// MARK: - EMISSION CHART
+// ======================================================
+
+private extension DashboardView {
+
+    func emissionChart(
         _ points: [EmissionPoint]
     ) -> some View {
 
@@ -564,7 +1076,8 @@ struct DashboardView: View {
                     )
             }
 
-            Chart(points) { point in
+            Chart(points) {
+                point in
 
                 AreaMark(
                     x: .value(
@@ -618,7 +1131,7 @@ struct DashboardView: View {
         }
         .padding()
         .background(
-            .white
+            Color.white
         )
         .clipShape(
             RoundedRectangle(
@@ -626,10 +1139,16 @@ struct DashboardView: View {
             )
         )
     }
+}
 
-    // MARK: - ALERT SECTION
 
-    private func alertSection(
+// ======================================================
+// MARK: - ALERTS
+// ======================================================
+
+private extension DashboardView {
+
+    func alertSection(
         _ alerts: [EcoAlert]
     ) -> some View {
 
@@ -656,7 +1175,8 @@ struct DashboardView: View {
 
             ForEach(
                 alerts
-            ) { alert in
+            ) {
+                alert in
 
                 HStack(
                     spacing: 12
@@ -664,7 +1184,8 @@ struct DashboardView: View {
 
                     Circle()
                         .fill(
-                            alert.severity == .critical
+                            alert.severity
+                                == .critical
                             ? Color.red
                             : Color.orange
                         )
@@ -692,11 +1213,41 @@ struct DashboardView: View {
         }
         .padding()
         .background(
-            .white
+            Color.white
         )
         .clipShape(
             RoundedRectangle(
                 cornerRadius: 20
+            )
+        )
+    }
+}
+
+
+// ======================================================
+// MARK: - FORMAT
+// ======================================================
+
+private extension DashboardView {
+
+    func moneyShort(
+        _ value: Double
+    ) -> String {
+
+        if value >= 1_000_000 {
+
+            let millions =
+                value
+                / 1_000_000
+
+            return
+                "\(millions.formatted(.number.precision(.fractionLength(1)))) triệu"
+        }
+
+        return value.formatted(
+            .number
+            .grouping(
+                .automatic
             )
         )
     }
