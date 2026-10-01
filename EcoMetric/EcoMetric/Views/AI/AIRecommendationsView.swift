@@ -1016,6 +1016,46 @@ struct ActionPlanView: View {
                 taskList
                 kpiCard
                 remeasureCard
+                NavigationLink {
+
+                    RemeasureView(
+                        input: input,
+                        result: result
+                    )
+
+                } label: {
+
+                    HStack {
+
+                        Image(
+                            systemName:
+                                "arrow.triangle.2.circlepath"
+                        )
+
+                        Text(
+                            "Xem kết quả đo lại"
+                        )
+                        .font(.headline)
+
+                        Spacer()
+
+                        Image(
+                            systemName:
+                                "arrow.right"
+                        )
+                    }
+                    .foregroundStyle(.white)
+                    .padding()
+                    .background(
+                        EcoTheme.green
+                    )
+                    .clipShape(
+                        RoundedRectangle(
+                            cornerRadius: 16
+                        )
+                    )
+                }
+                .buttonStyle(.plain)
             }
             .padding()
         }

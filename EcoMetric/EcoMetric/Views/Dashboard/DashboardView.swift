@@ -10,29 +10,32 @@ import Charts
 
 struct DashboardView: View {
 
+    let onOpenData: () -> Void
     let onOpenAI: () -> Void
+    let onOpenReports: () -> Void
 
     @State private var appeared = false
-
     @StateObject private var viewModel: DashboardViewModel
 
-    // MARK: - Energy Case
+    // MARK: - Demo Energy Case
 
     private let energyInput =
         EnergyCaseInput.workshop1LEDCase
 
     private var energyResult: EnergyCaseResult {
         EnergyCalculationService()
-            .calculate(
-                input: energyInput
-            )
+            .calculate(input: energyInput)
     }
 
     init(
-        onOpenAI: @escaping () -> Void = {}
+        onOpenData: @escaping () -> Void = {},
+        onOpenAI: @escaping () -> Void = {},
+        onOpenReports: @escaping () -> Void = {}
     ) {
 
+        self.onOpenData = onOpenData
         self.onOpenAI = onOpenAI
+        self.onOpenReports = onOpenReports
 
         _viewModel = StateObject(
             wrappedValue:
@@ -63,25 +66,26 @@ struct DashboardView: View {
                     ScrollView {
 
                         VStack(
-                            spacing: 20
+                            alignment: .leading,
+                            spacing: 22
                         ) {
 
                             header
 
-                            demoDataBadge
+                            quickFeatureSection
+
+                            prioritySection
+
+                            dataInputTool
 
                             if let data =
                                 viewModel.dashboard {
 
-                                mainEmissionCard(
+                                overviewSection(
                                     data.metrics
                                 )
 
-                                metricCards(
-                                    data.metrics
-                                )
-
-                                prioritySection
+                                aiInsightCard
 
                                 emissionChart(
                                     data.emissionTrend
@@ -92,6 +96,7 @@ struct DashboardView: View {
                                 )
                             }
                         }
+                        .padding()
                         .opacity(
                             appeared ? 1 : 0
                         )
@@ -99,18 +104,17 @@ struct DashboardView: View {
                             y:
                                 appeared
                                 ? 0
-                                : 18
+                                : 16
                         )
                         .animation(
                             .easeOut(
-                                duration: 0.5
+                                duration: 0.45
                             ),
                             value: appeared
                         )
                         .onAppear {
                             appeared = true
                         }
-                        .padding()
                     }
                 }
             }
@@ -132,7 +136,7 @@ private extension DashboardView {
 
         VStack(
             alignment: .leading,
-            spacing: 14
+            spacing: 16
         ) {
 
             HStack {
@@ -141,165 +145,247 @@ private extension DashboardView {
 
                 Spacer()
 
-                ZStack {
+                Button {
 
-                    Circle()
-                        .fill(
-                            EcoTheme.lightBlue
+                    // Notification demo
+
+                } label: {
+
+                    ZStack {
+
+                        Circle()
+                            .fill(
+                                EcoTheme.lightBlue
+                            )
+                            .frame(
+                                width: 44,
+                                height: 44
+                            )
+
+                        Image(
+                            systemName:
+                                "bell.fill"
                         )
-                        .frame(
-                            width: 44,
-                            height: 44
+                        .foregroundStyle(
+                            EcoTheme.blue
                         )
 
-                    Image(
-                        systemName:
-                            "bell.fill"
-                    )
-                    .foregroundStyle(
-                        EcoTheme.blue
-                    )
-
-                    Circle()
-                        .fill(
-                            Color.red
-                        )
-                        .frame(
-                            width: 8,
-                            height: 8
-                        )
-                        .offset(
-                            x: 12,
-                            y: -12
-                        )
+                        Circle()
+                            .fill(.red)
+                            .frame(
+                                width: 8,
+                                height: 8
+                            )
+                            .offset(
+                                x: 12,
+                                y: -12
+                            )
+                    }
                 }
+                .buttonStyle(.plain)
             }
 
             VStack(
                 alignment: .leading,
-                spacing: 4
+                spacing: 5
             ) {
 
                 Text("Xin chào 👋")
                     .font(
-                        .title3.bold()
+                        .title2.bold()
                     )
                     .foregroundStyle(
                         EcoTheme.navy
                     )
 
                 Text(
-                    "Cùng hành động vì một hành tinh xanh hơn!"
+                    "Hôm nay doanh nghiệp của bạn có thể làm gì để xanh hơn?"
                 )
-                .font(.caption)
+                .font(.subheadline)
                 .foregroundStyle(
                     .secondary
                 )
             }
+
+            HStack(
+                spacing: 7
+            ) {
+
+                Image(
+                    systemName:
+                        "info.circle.fill"
+                )
+
+                Text(
+                    "Dữ liệu minh họa"
+                )
+
+                Text("•")
+
+                Text(
+                    "MVP"
+                )
+                .fontWeight(.bold)
+            }
+            .font(.caption)
+            .foregroundStyle(
+                EcoTheme.darkGreen
+            )
         }
     }
 }
 
 
 // ======================================================
-// MARK: - DEMO DATA
+// MARK: - QUICK FEATURES
 // ======================================================
 
 private extension DashboardView {
 
-    var demoDataBadge: some View {
-
-        HStack(
-            spacing: 8
-        ) {
-
-            Image(
-                systemName:
-                    "info.circle.fill"
-            )
-
-            Text(
-                "Dữ liệu minh họa"
-            )
-            .font(
-                .caption.bold()
-            )
-
-            Spacer()
-
-            Text("MVP")
-                .font(
-                    .caption2.bold()
-                )
-                .padding(
-                    .horizontal,
-                    8
-                )
-                .padding(
-                    .vertical,
-                    4
-                )
-                .background(
-                    Color.white
-                        .opacity(0.8)
-                )
-                .clipShape(
-                    Capsule()
-                )
-        }
-        .foregroundStyle(
-            EcoTheme.darkGreen
-        )
-        .padding()
-        .background(
-            EcoTheme.lightGreen
-        )
-        .clipShape(
-            RoundedRectangle(
-                cornerRadius: 16
-            )
-        )
-    }
-}
-
-
-// ======================================================
-// MARK: - MAIN EMISSION CARD
-// ======================================================
-
-private extension DashboardView {
-
-    func mainEmissionCard(
-        _ metric: DashboardMetric
-    ) -> some View {
+    var quickFeatureSection: some View {
 
         VStack(
             alignment: .leading,
-            spacing: 18
+            spacing: 12
         ) {
 
             HStack {
 
+                Text(
+                    "Khám phá EcoMetric"
+                )
+                .font(
+                    .title3.bold()
+                )
+                .foregroundStyle(
+                    EcoTheme.navy
+                )
+
+                Spacer()
+
+                Text(
+                    "Tất cả công cụ"
+                )
+                .font(.caption)
+                .foregroundStyle(
+                    EcoTheme.blue
+                )
+            }
+
+            ScrollView(
+                .horizontal,
+                showsIndicators: false
+            ) {
+
+                HStack(
+                    spacing: 12
+                ) {
+
+                    quickFeatureCard(
+                        icon:
+                            "square.and.arrow.down.fill",
+                        title:
+                            "Nhập dữ liệu",
+                        subtitle:
+                            "Điện, nước...",
+                        color:
+                            EcoTheme.green
+                    ) {
+                        onOpenData()
+                    }
+
+                    quickFeatureCard(
+                        icon:
+                            "brain.head.profile",
+                        title:
+                            "AI phân tích",
+                        subtitle:
+                            "Tìm bất thường",
+                        color:
+                            EcoTheme.blue
+                    ) {
+                        onOpenAI()
+                    }
+
+                    quickFeatureCard(
+                        icon:
+                            "lightbulb.max.fill",
+                        title:
+                            "Giải pháp",
+                        subtitle:
+                            "Solution Card",
+                        color:
+                            .orange
+                    ) {
+                        onOpenAI()
+                    }
+
+                    quickFeatureCard(
+                        icon:
+                            "checklist",
+                        title:
+                            "Action Plan",
+                        subtitle:
+                            "Triển khai",
+                        color:
+                            EcoTheme.green
+                    ) {
+                        onOpenAI()
+                    }
+
+                    quickFeatureCard(
+                        icon:
+                            "doc.text.fill",
+                        title:
+                            "Báo cáo",
+                        subtitle:
+                            "ESG / Carbon",
+                        color:
+                            EcoTheme.blue
+                    ) {
+                        onOpenReports()
+                    }
+                }
+            }
+        }
+    }
+
+    func quickFeatureCard(
+        icon: String,
+        title: String,
+        subtitle: String,
+        color: Color,
+        action: @escaping () -> Void
+    ) -> some View {
+
+        Button(
+            action: action
+        ) {
+
+            VStack(
+                alignment: .leading,
+                spacing: 12
+            ) {
+
                 ZStack {
 
                     RoundedRectangle(
-                        cornerRadius: 16
+                        cornerRadius: 13
                     )
                     .fill(
-                        EcoTheme.lightGreen
+                        color.opacity(0.12)
                     )
                     .frame(
-                        width: 54,
-                        height: 54
+                        width: 44,
+                        height: 44
                     )
 
                     Image(
-                        systemName:
-                            "leaf.fill"
+                        systemName: icon
                     )
-                    .font(.title2)
+                    .font(.title3)
                     .foregroundStyle(
-                        EcoTheme.green
+                        color
                     )
                 }
 
@@ -308,248 +394,48 @@ private extension DashboardView {
                     spacing: 3
                 ) {
 
-                    Text(
-                        "Tổng phát thải CO₂e"
-                    )
-                    .font(.caption)
-                    .foregroundStyle(
-                        .secondary
-                    )
-
-                    HStack(
-                        alignment:
-                            .lastTextBaseline,
-                        spacing: 5
-                    ) {
-
-                        Text(
-                            "\(metric.totalEmission, specifier: "%.1f")"
-                        )
+                    Text(title)
                         .font(
-                            .system(
-                                size: 32,
-                                weight: .bold
-                            )
+                            .subheadline.bold()
                         )
                         .foregroundStyle(
                             EcoTheme.navy
                         )
 
-                        Text("tấn")
-                            .font(
-                                .caption
-                            )
-                            .foregroundStyle(
-                                .secondary
-                            )
-                    }
-                }
-
-                Spacer()
-
-                VStack(
-                    alignment: .trailing,
-                    spacing: 4
-                ) {
-
-                    Text(
-                        "\(metric.emissionChange, specifier: "%.1f")%"
-                    )
-                    .font(
-                        .caption.bold()
-                    )
-                    .foregroundStyle(
-                        EcoTheme.green
-                    )
-                    .padding(
-                        .horizontal,
-                        10
-                    )
-                    .padding(
-                        .vertical,
-                        6
-                    )
-                    .background(
-                        EcoTheme.lightGreen
-                    )
-                    .clipShape(
-                        Capsule()
-                    )
-
-                    Text(
-                        "so với tháng trước"
-                    )
-                    .font(.caption2)
-                    .foregroundStyle(
-                        .secondary
-                    )
+                    Text(subtitle)
+                        .font(.caption2)
+                        .foregroundStyle(
+                            .secondary
+                        )
                 }
             }
-
-            Divider()
-
-            HStack {
-
-                Label(
-                    "Dữ liệu cập nhật",
-                    systemImage:
-                        "clock.fill"
+            .frame(
+                width: 118,
+                alignment: .leading
+            )
+            .padding()
+            .background(
+                Color.white
+            )
+            .clipShape(
+                RoundedRectangle(
+                    cornerRadius: 18
                 )
-                .font(.caption2)
-                .foregroundStyle(
-                    .secondary
-                )
-
-                Spacer()
-
-                Text("Hôm nay")
-                    .font(
-                        .caption2.bold()
-                    )
-                    .foregroundStyle(
-                        EcoTheme.navy
-                    )
-            }
+            )
+            .shadow(
+                color:
+                    .black.opacity(0.035),
+                radius: 6,
+                y: 3
+            )
         }
-        .padding()
-        .background(
-            LinearGradient(
-                colors: [
-                    Color.white,
-                    EcoTheme.lightGreen
-                        .opacity(0.45)
-                ],
-                startPoint:
-                    .topLeading,
-                endPoint:
-                    .bottomTrailing
-            )
-        )
-        .clipShape(
-            RoundedRectangle(
-                cornerRadius: 22
-            )
-        )
-        .shadow(
-            color:
-                .black.opacity(0.05),
-            radius: 12,
-            y: 5
-        )
+        .buttonStyle(.plain)
     }
 }
 
 
 // ======================================================
-// MARK: - METRIC CARDS
-// ======================================================
-
-private extension DashboardView {
-
-    func metricCards(
-        _ metric: DashboardMetric
-    ) -> some View {
-
-        HStack(
-            spacing: 12
-        ) {
-
-            metricCard(
-                title:
-                    "Chi phí vận hành",
-                value:
-                    "\(Int(metric.operatingCost / 1_000_000))M",
-                subtitle:
-                    "VNĐ",
-                icon:
-                    "banknote.fill"
-            )
-
-            metricCard(
-                title:
-                    "Tiết kiệm case ưu tiên",
-                value:
-                    moneyShort(
-                        energyResult
-                            .costSavingVNDPerYear
-                    ),
-                subtitle:
-                    "VNĐ/năm",
-                icon:
-                    "chart.line.uptrend.xyaxis"
-            )
-        }
-    }
-
-    func metricCard(
-        title: String,
-        value: String,
-        subtitle: String,
-        icon: String
-    ) -> some View {
-
-        VStack(
-            alignment: .leading,
-            spacing: 10
-        ) {
-
-            Image(
-                systemName: icon
-            )
-            .font(.title3)
-            .foregroundStyle(
-                EcoTheme.green
-            )
-
-            Text(title)
-                .font(.caption)
-                .foregroundStyle(
-                    .secondary
-                )
-
-            Text(value)
-                .font(
-                    .title3.bold()
-                )
-                .foregroundStyle(
-                    EcoTheme.navy
-                )
-                .lineLimit(1)
-                .minimumScaleFactor(
-                    0.7
-                )
-
-            Text(subtitle)
-                .font(.caption2)
-                .foregroundStyle(
-                    .secondary
-                )
-        }
-        .frame(
-            maxWidth: .infinity,
-            alignment: .leading
-        )
-        .padding()
-        .background(
-            Color.white
-        )
-        .clipShape(
-            RoundedRectangle(
-                cornerRadius: 18
-            )
-        )
-        .shadow(
-            color:
-                .black.opacity(0.04),
-            radius: 8,
-            y: 3
-        )
-    }
-}
-
-
-// ======================================================
-// MARK: - 3 PRIORITIES
+// MARK: - PRIORITIES
 // ======================================================
 
 private extension DashboardView {
@@ -561,9 +447,7 @@ private extension DashboardView {
             spacing: 14
         ) {
 
-            HStack(
-                alignment: .top
-            ) {
+            HStack {
 
                 VStack(
                     alignment: .leading,
@@ -581,7 +465,7 @@ private extension DashboardView {
                     )
 
                     Text(
-                        "Các ưu tiên hành động trong tháng này"
+                        "Ưu tiên hành động trong tháng này"
                     )
                     .font(.caption)
                     .foregroundStyle(
@@ -591,17 +475,28 @@ private extension DashboardView {
 
                 Spacer()
 
-                Image(
-                    systemName:
-                        "target"
-                )
-                .font(.title2)
-                .foregroundStyle(
-                    EcoTheme.green
-                )
+                ZStack {
+
+                    Circle()
+                        .fill(
+                            EcoTheme.lightGreen
+                        )
+                        .frame(
+                            width: 42,
+                            height: 42
+                        )
+
+                    Image(
+                        systemName:
+                            "target"
+                    )
+                    .foregroundStyle(
+                        EcoTheme.green
+                    )
+                }
             }
 
-            prioritySummaryCard
+            impactSummaryCard
 
             NavigationLink {
 
@@ -616,20 +511,18 @@ private extension DashboardView {
 
                 priorityCard(
                     number: "01",
-                    title:
-                        "Giảm điện năng tại Xưởng 1",
-                    subtitle:
-                        "Thay 100 bóng 40W bằng LED 18W",
-                    impact:
-                        "\(moneyShort(energyResult.costSavingVNDPerMonth))/tháng",
-                    status:
-                        "Ưu tiên cao",
-                    color:
-                        EcoTheme.green,
                     icon:
                         "bolt.fill",
-                    showChevron:
-                        true
+                    color:
+                        EcoTheme.green,
+                    title:
+                        "Giảm điện năng tại Xưởng 1",
+                    description:
+                        "Thay 100 bóng 40W bằng LED 18W",
+                    value:
+                        "\(moneyShort(energyResult.costSavingVNDPerMonth))/tháng",
+                    badge:
+                        "Ưu tiên cao"
                 )
             }
             .buttonStyle(.plain)
@@ -642,20 +535,18 @@ private extension DashboardView {
 
                 priorityCard(
                     number: "02",
-                    title:
-                        "Tối ưu vận hành lò hơi",
-                    subtitle:
-                        "Phân tích thời gian vận hành và tải tiêu thụ",
-                    impact:
-                        "Đang phân tích",
-                    status:
-                        "Đang đánh giá",
-                    color:
-                        .orange,
                     icon:
                         "flame.fill",
-                    showChevron:
-                        true
+                    color:
+                        .orange,
+                    title:
+                        "Tối ưu vận hành lò hơi",
+                    description:
+                        "Phân tích tải và thời gian vận hành",
+                    value:
+                        "Đang phân tích",
+                    badge:
+                        "Đang đánh giá"
                 )
             }
             .buttonStyle(.plain)
@@ -668,20 +559,18 @@ private extension DashboardView {
 
                 priorityCard(
                     number: "03",
-                    title:
-                        "Giảm thất thoát nước",
-                    subtitle:
-                        "Kiểm tra mức tiêu thụ bất thường",
-                    impact:
-                        "Đang phân tích",
-                    status:
-                        "Đang đánh giá",
-                    color:
-                        EcoTheme.blue,
                     icon:
                         "drop.fill",
-                    showChevron:
-                        true
+                    color:
+                        EcoTheme.blue,
+                    title:
+                        "Giảm thất thoát nước",
+                    description:
+                        "Kiểm tra tiêu thụ bất thường",
+                    value:
+                        "Đang phân tích",
+                    badge:
+                        "Đang đánh giá"
                 )
             }
             .buttonStyle(.plain)
@@ -690,97 +579,65 @@ private extension DashboardView {
 }
 
 
-// ======================================================
-// MARK: - PRIORITY SUMMARY
-// ======================================================
+// MARK: - Impact Summary
 
 private extension DashboardView {
 
-    var prioritySummaryCard: some View {
+    var impactSummaryCard: some View {
 
         VStack(
             alignment: .leading,
-            spacing: 12
+            spacing: 13
         ) {
 
             HStack {
 
-                ZStack {
+                Image(
+                    systemName:
+                        "sparkles"
+                )
+                .foregroundStyle(
+                    EcoTheme.green
+                )
 
-                    Circle()
-                        .fill(
-                            EcoTheme.lightGreen
-                        )
-                        .frame(
-                            width: 44,
-                            height: 44
-                        )
-
-                    Image(
-                        systemName:
-                            "sparkles"
-                    )
-                    .foregroundStyle(
-                        EcoTheme.green
-                    )
-                }
-
-                VStack(
-                    alignment: .leading,
-                    spacing: 3
-                ) {
-
-                    Text(
-                        "Tác động có thể tạo ra"
-                    )
-                    .font(
-                        .caption
-                    )
-                    .foregroundStyle(
-                        .secondary
-                    )
-
-                    Text(
-                        "Tập trung vào ưu tiên 01"
-                    )
-                    .font(
-                        .headline
-                    )
-                    .foregroundStyle(
-                        EcoTheme.navy
-                    )
-                }
+                Text(
+                    "Nếu triển khai ưu tiên 01"
+                )
+                .font(
+                    .subheadline.bold()
+                )
+                .foregroundStyle(
+                    EcoTheme.navy
+                )
 
                 Spacer()
             }
 
-            Divider()
-
             HStack(
-                spacing: 12
+                spacing: 10
             ) {
 
-                summaryMetric(
-                    icon:
-                        "dollarsign.circle.fill",
+                smallImpact(
                     title:
                         "Tiết kiệm",
                     value:
-                        "\(moneyShort(energyResult.costSavingVNDPerYear))/năm"
+                        "\(moneyShort(energyResult.costSavingVNDPerYear))/năm",
+                    icon:
+                        "banknote.fill"
                 )
 
-                summaryMetric(
-                    icon:
-                        "clock.fill",
+                smallImpact(
                     title:
-                        "Hoàn vốn",
+                        "Payback",
                     value:
-                        "\(energyResult.paybackMonths.formatted(.number.precision(.fractionLength(1)))) tháng"
+                        "\(energyResult.paybackMonths.formatted(.number.precision(.fractionLength(1)))) tháng",
+                    icon:
+                        "clock.fill"
                 )
             }
 
             HStack(
-                spacing: 8
+                spacing: 7
             ) {
 
                 Image(
@@ -796,13 +653,13 @@ private extension DashboardView {
                         .co2SavingTonPerYear {
 
                     Text(
-                        "CO₂e giảm dự kiến: \(co2.formatted(.number.precision(.fractionLength(2)))) tCO₂e/năm"
+                        "Giảm \(co2.formatted(.number.precision(.fractionLength(2)))) tCO₂e/năm"
                     )
 
                 } else {
 
                     Text(
-                        "CO₂e sẽ được tính sau khi xác nhận hệ số phát thải điện."
+                        "CO₂e chờ xác nhận hệ số phát thải điện"
                     )
                 }
             }
@@ -831,14 +688,14 @@ private extension DashboardView {
         )
     }
 
-    func summaryMetric(
-        icon: String,
+    func smallImpact(
         title: String,
-        value: String
+        value: String,
+        icon: String
     ) -> some View {
 
         HStack(
-            spacing: 8
+            spacing: 9
         ) {
 
             Image(
@@ -854,9 +711,7 @@ private extension DashboardView {
             ) {
 
                 Text(title)
-                    .font(
-                        .caption2
-                    )
+                    .font(.caption2)
                     .foregroundStyle(
                         .secondary
                     )
@@ -878,37 +733,34 @@ private extension DashboardView {
         .padding(10)
         .background(
             Color.white
-                .opacity(0.8)
+                .opacity(0.85)
         )
         .clipShape(
             RoundedRectangle(
-                cornerRadius: 12
+                cornerRadius: 13
             )
         )
     }
 }
 
 
-// ======================================================
-// MARK: - PRIORITY CARD
-// ======================================================
+// MARK: - Priority Card
 
 private extension DashboardView {
 
     func priorityCard(
         number: String,
-        title: String,
-        subtitle: String,
-        impact: String,
-        status: String,
-        color: Color,
         icon: String,
-        showChevron: Bool
+        color: Color,
+        title: String,
+        description: String,
+        value: String,
+        badge: String
     ) -> some View {
 
         HStack(
             alignment: .top,
-            spacing: 12
+            spacing: 13
         ) {
 
             ZStack {
@@ -920,8 +772,8 @@ private extension DashboardView {
                     color.opacity(0.12)
                 )
                 .frame(
-                    width: 52,
-                    height: 52
+                    width: 54,
+                    height: 54
                 )
 
                 VStack(
@@ -961,7 +813,7 @@ private extension DashboardView {
                         EcoTheme.navy
                     )
 
-                Text(subtitle)
+                Text(description)
                     .font(.caption)
                     .foregroundStyle(
                         .secondary
@@ -974,7 +826,7 @@ private extension DashboardView {
                     spacing: 7
                 ) {
 
-                    Text(status)
+                    Text(badge)
                         .font(
                             .caption2.bold()
                         )
@@ -990,15 +842,13 @@ private extension DashboardView {
                             4
                         )
                         .background(
-                            color.opacity(
-                                0.10
-                            )
+                            color.opacity(0.1)
                         )
                         .clipShape(
                             Capsule()
                         )
 
-                    Text(impact)
+                    Text(value)
                         .font(
                             .caption2.bold()
                         )
@@ -1010,21 +860,18 @@ private extension DashboardView {
 
             Spacer()
 
-            if showChevron {
-
-                Image(
-                    systemName:
-                        "chevron.right"
-                )
-                .font(.caption.bold())
-                .foregroundStyle(
-                    .secondary
-                )
-                .padding(
-                    .top,
-                    4
-                )
-            }
+            Image(
+                systemName:
+                    "chevron.right"
+            )
+            .font(.caption.bold())
+            .foregroundStyle(
+                .secondary
+            )
+            .padding(
+                .top,
+                5
+            )
         }
         .padding()
         .background(
@@ -1046,7 +893,537 @@ private extension DashboardView {
 
 
 // ======================================================
-// MARK: - EMISSION CHART
+// MARK: - DATA INPUT TOOL
+// ======================================================
+
+private extension DashboardView {
+
+    var dataInputTool: some View {
+
+        VStack(
+            alignment: .leading,
+            spacing: 16
+        ) {
+
+            HStack {
+
+                VStack(
+                    alignment: .leading,
+                    spacing: 4
+                ) {
+
+                    Text(
+                        "Cập nhật dữ liệu"
+                    )
+                    .font(
+                        .title3.bold()
+                    )
+                    .foregroundStyle(
+                        EcoTheme.navy
+                    )
+
+                    Text(
+                        "Thêm dữ liệu vận hành mới"
+                    )
+                    .font(.caption)
+                    .foregroundStyle(
+                        .secondary
+                    )
+                }
+
+                Spacer()
+
+                Image(
+                    systemName:
+                        "square.and.arrow.up.fill"
+                )
+                .foregroundStyle(
+                    EcoTheme.green
+                )
+            }
+
+            HStack(
+                spacing: 8
+            ) {
+
+                dataTypeChip(
+                    icon:
+                        "bolt.fill",
+                    title:
+                        "Điện",
+                    color:
+                        EcoTheme.green
+                )
+
+                dataTypeChip(
+                    icon:
+                        "drop.fill",
+                    title:
+                        "Nước",
+                    color:
+                        EcoTheme.blue
+                )
+
+                dataTypeChip(
+                    icon:
+                        "fuelpump.fill",
+                    title:
+                        "Nhiên liệu",
+                    color:
+                        .orange
+                )
+
+                dataTypeChip(
+                    icon:
+                        "leaf.fill",
+                    title:
+                        "Nguyên liệu",
+                    color:
+                        EcoTheme.green
+                )
+            }
+
+            Button {
+
+                onOpenData()
+
+            } label: {
+
+                HStack {
+
+                    Image(
+                        systemName:
+                            "arrow.up.doc.fill"
+                    )
+
+                    Text(
+                        "Tải dữ liệu mới"
+                    )
+                    .font(
+                        .subheadline.bold()
+                    )
+
+                    Spacer()
+
+                    Image(
+                        systemName:
+                            "arrow.right"
+                    )
+                }
+                .foregroundStyle(
+                    .white
+                )
+                .padding()
+                .background(
+                    EcoTheme.green
+                )
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: 14
+                    )
+                )
+            }
+            .buttonStyle(.plain)
+        }
+        .padding()
+        .background(
+            Color.white
+        )
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: 20
+            )
+        )
+        .shadow(
+            color:
+                .black.opacity(0.04),
+            radius: 8,
+            y: 3
+        )
+    }
+
+    func dataTypeChip(
+        icon: String,
+        title: String,
+        color: Color
+    ) -> some View {
+
+        VStack(
+            spacing: 6
+        ) {
+
+            Image(
+                systemName: icon
+            )
+            .foregroundStyle(
+                color
+            )
+
+            Text(title)
+                .font(
+                    .system(
+                        size: 10,
+                        weight: .semibold
+                    )
+                )
+                .foregroundStyle(
+                    EcoTheme.navy
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(
+                    0.7
+                )
+        }
+        .frame(
+            maxWidth: .infinity
+        )
+        .padding(
+            .vertical,
+            10
+        )
+        .background(
+            color.opacity(0.08)
+        )
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: 12
+            )
+        )
+    }
+}
+
+
+// ======================================================
+// MARK: - OVERVIEW KPI
+// ======================================================
+
+private extension DashboardView {
+
+    func overviewSection(
+        _ metric: DashboardMetric
+    ) -> some View {
+
+        VStack(
+            alignment: .leading,
+            spacing: 14
+        ) {
+
+            Text(
+                "Tổng quan vận hành"
+            )
+            .font(
+                .title3.bold()
+            )
+            .foregroundStyle(
+                EcoTheme.navy
+            )
+
+            mainEmissionCard(
+                metric
+            )
+
+            HStack(
+                spacing: 12
+            ) {
+
+                metricCard(
+                    title:
+                        "Chi phí vận hành",
+                    value:
+                        "\(Int(metric.operatingCost / 1_000_000))M",
+                    subtitle:
+                        "VNĐ",
+                    icon:
+                        "banknote.fill"
+                )
+
+                metricCard(
+                    title:
+                        "Tiết kiệm tiềm năng",
+                    value:
+                        moneyShort(
+                            energyResult
+                                .costSavingVNDPerYear
+                        ),
+                    subtitle:
+                        "VNĐ/năm",
+                    icon:
+                        "chart.line.uptrend.xyaxis"
+                )
+            }
+        }
+    }
+
+    func mainEmissionCard(
+        _ metric: DashboardMetric
+    ) -> some View {
+
+        HStack(
+            spacing: 14
+        ) {
+
+            ZStack {
+
+                RoundedRectangle(
+                    cornerRadius: 16
+                )
+                .fill(
+                    EcoTheme.lightGreen
+                )
+                .frame(
+                    width: 55,
+                    height: 55
+                )
+
+                Image(
+                    systemName:
+                        "leaf.fill"
+                )
+                .font(.title2)
+                .foregroundStyle(
+                    EcoTheme.green
+                )
+            }
+
+            VStack(
+                alignment: .leading,
+                spacing: 4
+            ) {
+
+                Text(
+                    "Tổng phát thải CO₂e"
+                )
+                .font(.caption)
+                .foregroundStyle(
+                    .secondary
+                )
+
+                HStack(
+                    alignment:
+                        .lastTextBaseline,
+                    spacing: 5
+                ) {
+
+                    Text(
+                        "\(metric.totalEmission, specifier: "%.1f")"
+                    )
+                    .font(
+                        .system(
+                            size: 30,
+                            weight: .bold
+                        )
+                    )
+                    .foregroundStyle(
+                        EcoTheme.navy
+                    )
+
+                    Text("tấn")
+                        .font(.caption)
+                        .foregroundStyle(
+                            .secondary
+                        )
+                }
+            }
+
+            Spacer()
+
+            VStack(
+                alignment: .trailing,
+                spacing: 4
+            ) {
+
+                Text(
+                    "\(metric.emissionChange, specifier: "%.1f")%"
+                )
+                .font(
+                    .caption.bold()
+                )
+                .foregroundStyle(
+                    EcoTheme.green
+                )
+
+                Text(
+                    "so với kỳ trước"
+                )
+                .font(.caption2)
+                .foregroundStyle(
+                    .secondary
+                )
+            }
+        }
+        .padding()
+        .background(
+            LinearGradient(
+                colors: [
+                    Color.white,
+                    EcoTheme.lightGreen
+                        .opacity(0.45)
+                ],
+                startPoint:
+                    .topLeading,
+                endPoint:
+                    .bottomTrailing
+            )
+        )
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: 20
+            )
+        )
+    }
+
+    func metricCard(
+        title: String,
+        value: String,
+        subtitle: String,
+        icon: String
+    ) -> some View {
+
+        VStack(
+            alignment: .leading,
+            spacing: 9
+        ) {
+
+            Image(
+                systemName: icon
+            )
+            .foregroundStyle(
+                EcoTheme.green
+            )
+
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(
+                    .secondary
+                )
+
+            Text(value)
+                .font(
+                    .headline
+                )
+                .foregroundStyle(
+                    EcoTheme.navy
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(
+                    0.7
+                )
+
+            Text(subtitle)
+                .font(.caption2)
+                .foregroundStyle(
+                    .secondary
+                )
+        }
+        .frame(
+            maxWidth: .infinity,
+            alignment: .leading
+        )
+        .padding()
+        .background(
+            Color.white
+        )
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: 17
+            )
+        )
+    }
+}
+
+
+// ======================================================
+// MARK: - AI INSIGHT
+// ======================================================
+
+private extension DashboardView {
+
+    var aiInsightCard: some View {
+
+        Button {
+
+            onOpenAI()
+
+        } label: {
+
+            HStack(
+                spacing: 14
+            ) {
+
+                ZStack {
+
+                    Circle()
+                        .fill(
+                            EcoTheme.lightBlue
+                        )
+                        .frame(
+                            width: 48,
+                            height: 48
+                        )
+
+                    Image(
+                        systemName:
+                            "brain.head.profile"
+                    )
+                    .foregroundStyle(
+                        EcoTheme.blue
+                    )
+                }
+
+                VStack(
+                    alignment: .leading,
+                    spacing: 4
+                ) {
+
+                    Text(
+                        "AI Insight"
+                    )
+                    .font(
+                        .headline
+                    )
+                    .foregroundStyle(
+                        EcoTheme.navy
+                    )
+
+                    Text(
+                        "Hệ thống chiếu sáng Xưởng 1 đang là cơ hội tối ưu đáng chú ý."
+                    )
+                    .font(.caption)
+                    .foregroundStyle(
+                        .secondary
+                    )
+                    .multilineTextAlignment(
+                        .leading
+                    )
+                }
+
+                Spacer()
+
+                Image(
+                    systemName:
+                        "chevron.right"
+                )
+                .foregroundStyle(
+                    EcoTheme.blue
+                )
+            }
+            .padding()
+            .background(
+                EcoTheme.lightBlue
+            )
+            .clipShape(
+                RoundedRectangle(
+                    cornerRadius: 18
+                )
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+
+// ======================================================
+// MARK: - CHART
 // ======================================================
 
 private extension DashboardView {
@@ -1063,9 +1440,14 @@ private extension DashboardView {
             HStack {
 
                 Text(
-                    "Biểu đồ xu hướng phát thải"
+                    "Xu hướng phát thải"
                 )
-                .font(.headline)
+                .font(
+                    .title3.bold()
+                )
+                .foregroundStyle(
+                    EcoTheme.navy
+                )
 
                 Spacer()
 
@@ -1126,7 +1508,7 @@ private extension DashboardView {
                 )
             }
             .frame(
-                height: 220
+                height: 210
             )
         }
         .padding()
@@ -1143,7 +1525,7 @@ private extension DashboardView {
 
 
 // ======================================================
-// MARK: - ALERTS
+// MARK: - ALERT
 // ======================================================
 
 private extension DashboardView {
@@ -1159,10 +1541,13 @@ private extension DashboardView {
 
             HStack {
 
-                Text(
-                    "Cảnh báo / Chỉ số bất thường"
-                )
-                .font(.headline)
+                Text("Cảnh báo")
+                    .font(
+                        .title3.bold()
+                    )
+                    .foregroundStyle(
+                        EcoTheme.navy
+                    )
 
                 Spacer()
 
@@ -1175,8 +1560,7 @@ private extension DashboardView {
 
             ForEach(
                 alerts
-            ) {
-                alert in
+            ) { alert in
 
                 HStack(
                     spacing: 12
@@ -1237,8 +1621,7 @@ private extension DashboardView {
         if value >= 1_000_000 {
 
             let millions =
-                value
-                / 1_000_000
+                value / 1_000_000
 
             return
                 "\(millions.formatted(.number.precision(.fractionLength(1)))) triệu"

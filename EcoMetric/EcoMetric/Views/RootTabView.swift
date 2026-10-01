@@ -17,10 +17,17 @@ struct RootTabView: View {
         TabView(selection: $selectedTab) {
 
             DashboardView(
+                onOpenData: {
+                    selectedTab = .data
+                },
                 onOpenAI: {
                     selectedTab = .ai
+                },
+                onOpenReports: {
+                    selectedTab = .reports
                 }
             )
+            
             .tag(AppTab.dashboard)
             .tabItem {
                 Label(
