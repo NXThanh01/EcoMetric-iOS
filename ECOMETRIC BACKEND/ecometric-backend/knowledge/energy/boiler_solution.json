@@ -1,0 +1,33 @@
+{
+  "id": "energy_boiler_001",
+  "category": "energy",
+  "problem": "boiler_high_fuel_consumption",
+  "title": "Tối ưu vận hành lò hơi",
+  "solution": "optimize_boiler_operation",
+  "description": "Tối ưu tải vận hành, thời gian chạy và hiệu suất lò hơi để giảm tiêu thụ nhiên liệu.",
+  "applicable_when": [
+    "Lò hơi vận hành nhiều giờ",
+    "Mức tiêu thụ nhiên liệu cao",
+    "Tải vận hành thay đổi lớn",
+    "Có dữ liệu về thời gian chạy và nhiên liệu"
+  ],
+  "calculation_logic": {
+    "fuel_saving_formula": "baseline_fuel - optimized_fuel",
+    "cost_saving_formula": "fuel_saving * fuel_price",
+    "payback_formula": "investment / monthly_cost_saving"
+  },
+  "implementation_steps": [
+    "Thu thập dữ liệu vận hành lò hơi",
+    "Phân tích mức tải và thời gian vận hành",
+    "Xác định thời điểm vận hành không hiệu quả",
+    "Điều chỉnh lịch vận hành",
+    "Đo lại lượng nhiên liệu sau triển khai"
+  ],
+  "source": {
+    "organization": "Chưa xác nhận",
+    "document_title": "Chưa xác nhận",
+    "year": null,
+    "url": null,
+    "verified": false
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "energy_led_001",
+  "category": "energy",
+  "problem": "lighting_high_consumption",
+  "title": "Thay đèn huỳnh quang bằng LED",
+  "solution": "replace_fluorescent_with_led",
+  "description": "Thay hệ thống chiếu sáng công suất cao bằng đèn LED công suất thấp hơn để giảm điện năng tiêu thụ.",
+  "applicable_when": [
+    "Hệ thống chiếu sáng hoạt động nhiều giờ mỗi ngày",
+    "Đèn hiện tại có công suất cao",
+    "Có thể thay thế trực tiếp bằng LED phù hợp"
+  ],
+  "calculation_logic": {
+    "energy_saving_formula": "quantity * (current_power_w - proposed_power_w) * hours_per_day * days_per_month / 1000",
+    "cost_saving_formula": "energy_saving_kwh_month * electricity_price_vnd_per_kwh",
+    "payback_formula": "investment_vnd / cost_saving_vnd_month"
+  },
+  "implementation_steps": [
+    "Kiểm kê số lượng và công suất đèn hiện tại",
+    "Chọn mẫu LED phù hợp",
+    "Lấy báo giá",
+    "Phê duyệt ngân sách",
+    "Thay thế hệ thống chiếu sáng",
+    "Đo lại điện năng sau triển khai"
+  ],
+  "source": {
+    "organization": "VNEEC - Chương trình quốc gia về sử dụng năng lượng tiết kiệm và hiệu quả",
+    "document_title": "Kinh nghiệm chọn mua và sử dụng đèn chiếu sáng tiết kiệm điện",
+    "year": 2024,
+    "url": "https://vneec.gov.vn/tin-tuc/meo-huu-ich/t31571/kinh-nghiem-chon-mua-va-su-dung-den-chieu-sang-tiet-kiem-dien",
+    "verified": true
+  }
+}

@@ -21,7 +21,7 @@
 - theo dõi hiệu quả giảm phát thải;
 - hỗ trợ ESG / Carbon Reporting.
 
-Phiên bản hiện tại là **iOS Prototype / MVP Demo**, tập trung vào UI/UX, workflow và mock data trước khi tích hợp backend.
+Phiên bản hiện tại là **iOS MVP Demo**. Dashboard, nhập dữ liệu và báo cáo vẫn dùng mock data; luồng khuyến nghị tiết kiệm điện đã bắt đầu kết nối với EcoMetric Backend.
 
 ---
 
@@ -30,13 +30,13 @@ Phiên bản hiện tại là **iOS Prototype / MVP Demo**, tập trung vào UI/
 
 ```text
 Platform      : iOS
-Version       : 0.1 Demo
+Version       : 0.2 MVP
 Language      : Swift
 Framework     : SwiftUI
 Architecture  : MVVM-style
-Backend       : Chưa kết nối
-Data          : Mock Data
-AI            : Simulated AI Flow
+Backend       : FastAPI MVP (local)
+Data          : Hybrid Mock Data / API
+AI            : Knowledge Base + Calculation Engine
 Branch        : main
 Chức năng chính
 Splash Screen
@@ -80,9 +80,9 @@ ViewModel
      ↓
 Service Protocol
      ↓
-Mock Service
+API Service / Mock Service
      ↓
-Mock Data
+FastAPI Backend / Mock Data
 
 Sau này:
 
@@ -214,4 +214,3 @@ Public access to this repository does not grant permission to copy, modify, redi
 
 Copyright © 2026 Nguyễn Xuân Thành.
 All Rights Reserved.
-
