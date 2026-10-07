@@ -76,7 +76,7 @@ flowchart TD
 |---|---|:---:|
 | Dashboard | CO₂e, chi phí, tiềm năng tiết kiệm, biểu đồ xu hướng | 🟡 Mock data |
 | Data Input | Điện, nước, nhiên liệu, nguyên liệu và file upload | 🟡 Simulation |
-| Recommendation Engine | Knowledge retrieval và calculation engine | 🟢 API hoạt động |
+| Recommendation Engine | Opportunity detection, knowledge retrieval, calculation và ranking | 🟢 API hoạt động |
 | Solution Detail | Chỉ số tiết kiệm, hoàn vốn, nguồn và metadata | 🟢 Hoạt động |
 | Action Plan | Các bước triển khai, người phụ trách, deadline, KPI | 🟢 MVP |
 | Remeasure | So sánh trước và sau triển khai | 🟡 MVP demo |
@@ -226,7 +226,9 @@ Backend mặc định chạy tại `http://127.0.0.1:8000`:
 
 - Health check: `GET /health`
 - Knowledge sample: `GET /knowledge/led`
-- Recommendation: `POST /recommend`
+- Opportunity detection: `POST /analyze`
+- Ranked recommendations: `POST /recommendations`
+- Top recommendation cho iOS hiện tại: `POST /recommend`
 - OpenAPI documentation: `GET /docs`
 
 ### 3. Chạy ứng dụng iOS
@@ -327,6 +329,8 @@ flowchart LR
 - [x] Energy calculation engine cho use case LED
 - [x] FastAPI recommendation endpoint
 - [x] Knowledge base có source metadata
+- [x] Opportunity detection và recommendation scoring
+- [x] Xếp hạng nhiều giải pháp cho cùng một vấn đề
 - [x] Local calculation fallback trên iOS
 - [ ] Kết nối dữ liệu người dùng nhập với recommendation engine
 - [ ] Lưu trữ dữ liệu và authentication

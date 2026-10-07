@@ -2,7 +2,7 @@
 //  EnergyCalculationService.swift
 //  EcoMetric
 //
-//  Created by Nguyễn Xuân Thành on 30/9/26.
+//  Được tạo bởi Nguyễn Xuân Thành on 30/9/26.
 //
 
 import Foundation
@@ -49,7 +49,7 @@ struct EnergyCalculationService {
             costSavingVNDPerMonth * 12
 
 
-        // 6. Payback
+        // 6. Thời gian hoàn vốn
 
         let paybackMonths: Double
 
@@ -65,9 +65,9 @@ struct EnergyCalculationService {
         }
 
 
-        // 7. ROI năm đầu
+        // 7. Tỷ suất hoàn vốn năm đầu
         //
-        // ROI =
+        // Tỷ suất hoàn vốn =
         // (Lợi ích năm đầu - Chi phí đầu tư)
         // / Chi phí đầu tư × 100
 
@@ -89,7 +89,7 @@ struct EnergyCalculationService {
         }
 
 
-        // 8. CO2e reduction
+        // 8. Lượng CO2e giảm
 
         var co2SavingTonPerMonth: Double?
         var co2SavingTonPerYear: Double?
@@ -97,7 +97,7 @@ struct EnergyCalculationService {
         if let emissionFactor =
             input.emissionFactorKgCO2ePerKWh {
 
-            // kg CO2e → ton CO2e
+            // kg CO2e → tấn CO2e
 
             co2SavingTonPerMonth =
                 energySavingKWhPerMonth

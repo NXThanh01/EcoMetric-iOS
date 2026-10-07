@@ -2,7 +2,7 @@
 //  RemeasureView.swift
 //  EcoMetric
 //
-//  Created by Nguyễn Xuân Thành on 1/10/26.
+//  Được tạo bởi Nguyễn Xuân Thành on 1/10/26.
 //
 
 import SwiftUI
@@ -70,7 +70,7 @@ struct RemeasureView: View {
 }
 
 
-// MARK: - Header
+// MARK: - Tiêu đề
 
 private extension RemeasureView {
 
@@ -109,7 +109,7 @@ private extension RemeasureView {
 }
 
 
-// MARK: - Demo Badge
+// MARK: - Nhãn demo
 
 private extension RemeasureView {
 
@@ -164,7 +164,7 @@ private extension RemeasureView {
 }
 
 
-// MARK: - Before / After
+// MARK: - Trước / Sau
 
 private extension RemeasureView {
 
@@ -308,7 +308,7 @@ private extension RemeasureView {
 }
 
 
-// MARK: - Result Summary
+// MARK: - Tóm tắt kết quả
 
 private extension RemeasureView {
 
@@ -444,7 +444,7 @@ private extension RemeasureView {
 }
 
 
-// MARK: - KPI Status
+// MARK: - Trạng thái KPI
 
 private extension RemeasureView {
 
@@ -511,7 +511,7 @@ private extension RemeasureView {
 }
 
 
-// MARK: - Measurement Note
+// MARK: - Ghi chú đo lường
 
 private extension RemeasureView {
 

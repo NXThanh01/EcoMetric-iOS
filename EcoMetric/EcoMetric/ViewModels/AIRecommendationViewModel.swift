@@ -2,7 +2,7 @@
 //  AIRecommendationViewModel.swift
 //  EcoMetric
 //
-//  Created by Nguyễn Xuân Thành on 2/10/26.
+//  Được tạo bởi Nguyễn Xuân Thành on 2/10/26.
 //
 
 import Foundation
@@ -17,9 +17,13 @@ final class AIRecommendationViewModel: ObservableObject {
 
     private let service: AIRecommendationAPIService
 
-    init(
-        service: AIRecommendationAPIService =
+    init() {
+        self.service =
             AIRecommendationAPIService()
+    }
+
+    init(
+        service: AIRecommendationAPIService
     ) {
         self.service = service
     }

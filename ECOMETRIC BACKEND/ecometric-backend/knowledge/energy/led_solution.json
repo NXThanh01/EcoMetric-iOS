@@ -4,6 +4,8 @@
   "problem": "lighting_high_consumption",
   "title": "Thay đèn huỳnh quang bằng LED",
   "solution": "replace_fluorescent_with_led",
+  "calculator": "lighting_replacement",
+  "applicability_score": 1.0,
   "description": "Thay hệ thống chiếu sáng công suất cao bằng đèn LED công suất thấp hơn để giảm điện năng tiêu thụ.",
   "applicable_when": [
     "Hệ thống chiếu sáng hoạt động nhiều giờ mỗi ngày",

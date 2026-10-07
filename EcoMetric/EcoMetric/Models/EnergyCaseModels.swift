@@ -2,12 +2,12 @@
 //  EnergyCaseModels.swift
 //  EcoMetric
 //
-//  Created by Nguyễn Xuân Thành on 30/9/26.
+//  Được tạo bởi Nguyễn Xuân Thành on 30/9/26.
 //
 
 import Foundation
 
-// MARK: - Data Origin
+// MARK: - Nguồn dữ liệu
 
 enum EcoDataOrigin: String {
     case illustrative = "Dữ liệu minh họa"
@@ -17,7 +17,7 @@ enum EcoDataOrigin: String {
 }
 
 
-// MARK: - Energy Case Input
+// MARK: - Dữ liệu đầu vào tình huống năng lượng
 
 struct EnergyCaseInput {
 
@@ -41,9 +41,9 @@ struct EnergyCaseInput {
     // Chi phí đầu tư
     let investmentVND: Double
 
-    // Carbon Emission Factor
+    // Hệ số phát thải carbon
     //
-    // Tạm thời để optional vì phải xác nhận
+    // Tạm thời để tùy chọn vì cần xác nhận
     // hệ số phát thải và nguồn trước khi demo chính thức.
     let emissionFactorKgCO2ePerKWh: Double?
     let emissionFactorSource: String?
@@ -53,35 +53,35 @@ struct EnergyCaseInput {
 }
 
 
-// MARK: - Calculation Result
+// MARK: - Kết quả tính toán
 
 struct EnergyCaseResult {
 
     // Chênh lệch công suất
     let powerReductionWPerLamp: Double
 
-    // Energy Saving
+    // Điện năng tiết kiệm
     let energySavingKWhPerMonth: Double
     let energySavingKWhPerYear: Double
 
-    // Cost Saving
+    // Chi phí tiết kiệm
     let costSavingVNDPerMonth: Double
     let costSavingVNDPerYear: Double
 
-    // Investment
+    // Chi phí đầu tư
     let investmentVND: Double
 
-    // Financial Metrics
+    // Chỉ số tài chính
     let paybackMonths: Double
     let firstYearROIPercent: Double
 
-    // Carbon Reduction
+    // Lượng carbon giảm
     let co2SavingTonPerMonth: Double?
     let co2SavingTonPerYear: Double?
 }
 
 
-// MARK: - Demo Case
+// MARK: - Tình huống demo
 
 extension EnergyCaseInput {
 

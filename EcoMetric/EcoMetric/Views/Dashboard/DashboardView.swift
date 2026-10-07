@@ -2,7 +2,7 @@
 //  DashboardView.swift
 //  EcoMetric
 //
-//  Created by Nguyễn Xuân Thành on 19/9/26.
+//  Được tạo bởi Nguyễn Xuân Thành on 19/9/26.
 //
 
 import SwiftUI
@@ -17,7 +17,7 @@ struct DashboardView: View {
     @State private var appeared = false
     @StateObject private var viewModel: DashboardViewModel
 
-    // MARK: - Demo Energy Case
+    // MARK: - Tình huống năng lượng demo
 
     private let energyInput =
         EnergyCaseInput.workshop1LEDCase
@@ -127,7 +127,7 @@ struct DashboardView: View {
 
 
 // ======================================================
-// MARK: - HEADER
+// MARK: - TIÊU ĐỀ
 // ======================================================
 
 private extension DashboardView {
@@ -147,7 +147,7 @@ private extension DashboardView {
 
                 Button {
 
-                    // Notification demo
+                    // Thông báo minh họa
 
                 } label: {
 
@@ -237,7 +237,7 @@ private extension DashboardView {
 
 
 // ======================================================
-// MARK: - QUICK FEATURES
+// MARK: - TÍNH NĂNG NHANH
 // ======================================================
 
 private extension DashboardView {
@@ -435,7 +435,7 @@ private extension DashboardView {
 
 
 // ======================================================
-// MARK: - PRIORITIES
+// MARK: - CÁC ƯU TIÊN
 // ======================================================
 
 private extension DashboardView {
@@ -579,7 +579,7 @@ private extension DashboardView {
 }
 
 
-// MARK: - Impact Summary
+// MARK: - Tóm tắt tác động
 
 private extension DashboardView {
 
@@ -744,7 +744,7 @@ private extension DashboardView {
 }
 
 
-// MARK: - Priority Card
+// MARK: - Thẻ ưu tiên
 
 private extension DashboardView {
 
@@ -893,7 +893,7 @@ private extension DashboardView {
 
 
 // ======================================================
-// MARK: - DATA INPUT TOOL
+// MARK: - CÔNG CỤ NHẬP DỮ LIỆU
 // ======================================================
 
 private extension DashboardView {
@@ -1094,7 +1094,7 @@ private extension DashboardView {
 
 
 // ======================================================
-// MARK: - OVERVIEW KPI
+// MARK: - TỔNG QUAN KPI
 // ======================================================
 
 private extension DashboardView {
@@ -1333,7 +1333,7 @@ private extension DashboardView {
 
 
 // ======================================================
-// MARK: - AI INSIGHT
+// MARK: - PHÂN TÍCH AI
 // ======================================================
 
 private extension DashboardView {
@@ -1423,7 +1423,7 @@ private extension DashboardView {
 
 
 // ======================================================
-// MARK: - CHART
+// MARK: - BIỂU ĐỒ
 // ======================================================
 
 private extension DashboardView {
@@ -1525,7 +1525,7 @@ private extension DashboardView {
 
 
 // ======================================================
-// MARK: - ALERT
+// MARK: - CẢNH BÁO
 // ======================================================
 
 private extension DashboardView {
@@ -1609,7 +1609,7 @@ private extension DashboardView {
 
 
 // ======================================================
-// MARK: - FORMAT
+// MARK: - ĐỊNH DẠNG
 // ======================================================
 
 private extension DashboardView {

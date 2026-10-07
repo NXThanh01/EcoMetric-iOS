@@ -2,7 +2,7 @@
 //  EcoTheme.swift
 //  EcoMetric
 //
-//  Created by Nguyễn Xuân Thành on 19/9/26.
+//  Được tạo bởi Nguyễn Xuân Thành on 19/9/26.
 //
 
 import SwiftUI
@@ -31,6 +31,16 @@ enum EcoTheme {
         red: 14 / 255,
         green: 45 / 255,
         blue: 93 / 255
+    )
+
+    // Màu chữ ngữ nghĩa giúp nội dung luôn rõ trên các bề mặt sáng cố định
+    // của bản MVP hiện tại, không phụ thuộc chế độ hiển thị của thiết bị.
+    static let textPrimary = navy
+
+    static let textSecondary = Color(
+        red: 82 / 255,
+        green: 96 / 255,
+        blue: 112 / 255
     )
     
     static let background = Color(

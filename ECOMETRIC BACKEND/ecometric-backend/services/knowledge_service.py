@@ -21,22 +21,27 @@ def load_all_knowledge():
             data = json.load(file)
             records.append(data)
 
-    return records
+    return sorted(
+        records,
+        key=lambda record: record.get("id", ""),
+    )
+
+
+def find_solutions(
+    category: str,
+    problem: str,
+):
+    return [
+        record
+        for record in load_all_knowledge()
+        if record.get("category") == category
+        and record.get("problem") == problem
+    ]
 
 
 def find_solution(
     category: str,
     problem: str
 ):
-    records = load_all_knowledge()
-
-    for record in records:
-
-        if (
-            record.get("category") == category
-            and
-            record.get("problem") == problem
-        ):
-            return record
-
-    return None
+    records = find_solutions(category, problem)
+    return records[0] if records else None

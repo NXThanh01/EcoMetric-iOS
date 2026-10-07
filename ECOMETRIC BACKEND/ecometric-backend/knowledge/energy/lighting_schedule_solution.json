@@ -1,0 +1,36 @@
+{
+  "id": "energy_lighting_schedule_001",
+  "category": "energy",
+  "problem": "lighting_high_consumption",
+  "title": "Tối ưu lịch vận hành chiếu sáng",
+  "solution": "optimize_lighting_schedule",
+  "calculator": "lighting_schedule_optimization",
+  "applicability_score": 0.8,
+  "description": "Rà soát thời gian bật đèn và tắt các khu vực không sử dụng để giảm số giờ vận hành không cần thiết.",
+  "applicable_when": [
+    "Hệ thống chiếu sáng hoạt động trong thời gian dài",
+    "Có khu vực không được sử dụng liên tục",
+    "Có thể điều chỉnh quy trình bật và tắt đèn"
+  ],
+  "assumptions": {
+    "estimated_runtime_reduction_percent": 10
+  },
+  "calculation_logic": {
+    "energy_saving_formula": "current_lighting_energy * estimated_runtime_reduction_percent",
+    "cost_saving_formula": "energy_saving_kwh_month * electricity_price_vnd_per_kwh"
+  },
+  "implementation_steps": [
+    "Khảo sát thời gian sử dụng từng khu vực",
+    "Xác định khoảng thời gian chiếu sáng không cần thiết",
+    "Thiết lập lịch bật và tắt đèn",
+    "Phân công người chịu trách nhiệm",
+    "Đo lại điện năng sau 30 ngày"
+  ],
+  "source": {
+    "organization": "Chưa xác nhận",
+    "document_title": "Giả định nội bộ cho MVP",
+    "year": null,
+    "url": null,
+    "verified": false
+  }
+}

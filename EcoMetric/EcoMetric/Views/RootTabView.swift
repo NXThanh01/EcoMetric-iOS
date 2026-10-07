@@ -85,5 +85,9 @@ struct RootTabView: View {
             .visible,
             for: .tabBar
         )
+        .toolbarColorScheme(
+            .light,
+            for: .tabBar
+        )
     }
 }

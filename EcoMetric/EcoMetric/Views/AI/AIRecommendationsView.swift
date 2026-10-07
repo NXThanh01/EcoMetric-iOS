@@ -2,19 +2,19 @@
 //  AIRecommendationsView.swift
 //  EcoMetric
 //
-//  Created by Nguyễn Xuân Thành on 19/9/26.
+//  Được tạo bởi Nguyễn Xuân Thành on 19/9/26.
 //
 //
 //  AIRecommendationsView.swift
 //  EcoMetric
 //
-//  Solution-based Recommendation Screen
+//  Màn hình khuyến nghị theo giải pháp
 //
 
 import SwiftUI
 
 // ======================================================
-// MARK: - AI RECOMMENDATIONS
+// MARK: - KHUYẾN NGHỊ AI
 // ======================================================
 
 struct AIRecommendationsView: View {
@@ -25,14 +25,14 @@ struct AIRecommendationsView: View {
     private let input =
         EnergyCaseInput.workshop1LEDCase
 
-    // MARK: Local fallback
+    // MARK: Phương án dự phòng cục bộ
 
     private var localResult: EnergyCaseResult {
         EnergyCalculationService()
             .calculate(input: input)
     }
 
-    // MARK: Backend + Fallback values
+    // MARK: Giá trị từ backend và phương án dự phòng
 
     private var solutionTitle: String {
         apiViewModel.recommendation?.solution
@@ -89,7 +89,7 @@ struct AIRecommendationsView: View {
         ) / investmentVND * 100
     }
 
-    // Result truyền tiếp sang Detail / Action Plan
+    // Kết quả được truyền sang Chi tiết giải pháp và Kế hoạch hành động
 
     private var displayResult: EnergyCaseResult {
 
@@ -171,7 +171,7 @@ struct AIRecommendationsView: View {
 
 
 // ======================================================
-// MARK: - HEADER
+// MARK: - TIÊU ĐỀ
 // ======================================================
 
 private extension AIRecommendationsView {
@@ -202,7 +202,7 @@ private extension AIRecommendationsView {
 
 
 // ======================================================
-// MARK: - API STATUS
+// MARK: - TRẠNG THÁI API
 // ======================================================
 
 private extension AIRecommendationsView {
@@ -320,7 +320,7 @@ private extension AIRecommendationsView {
 
 
 // ======================================================
-// MARK: - DEMO BADGE
+// MARK: - NHÃN DEMO
 // ======================================================
 
 private extension AIRecommendationsView {
@@ -379,7 +379,7 @@ private extension AIRecommendationsView {
 
 
 // ======================================================
-// MARK: - AI INSIGHT
+// MARK: - PHÂN TÍCH AI
 // ======================================================
 
 private extension AIRecommendationsView {
@@ -509,7 +509,7 @@ private extension AIRecommendationsView {
 
 
 // ======================================================
-// MARK: - PRIORITY
+// MARK: - ƯU TIÊN
 // ======================================================
 
 private extension AIRecommendationsView {
@@ -544,7 +544,7 @@ private extension AIRecommendationsView {
 
 
 // ======================================================
-// MARK: - SOLUTION CARD
+// MARK: - THẺ GIẢI PHÁP
 // ======================================================
 
 private extension AIRecommendationsView {
@@ -707,7 +707,7 @@ private extension AIRecommendationsView {
 
 
 // ======================================================
-// MARK: - DATA SECTION
+// MARK: - PHẦN DỮ LIỆU
 // ======================================================
 
 private extension AIRecommendationsView {
@@ -797,7 +797,7 @@ private extension AIRecommendationsView {
 
 
 // ======================================================
-// MARK: - SOLUTION SECTION
+// MARK: - PHẦN GIẢI PHÁP
 // ======================================================
 
 private extension AIRecommendationsView {
@@ -868,7 +868,7 @@ private extension AIRecommendationsView {
 
 
 // ======================================================
-// MARK: - IMPACT
+// MARK: - TÁC ĐỘNG
 // ======================================================
 
 private extension AIRecommendationsView {
@@ -1065,7 +1065,7 @@ private extension AIRecommendationsView {
 
 
 // ======================================================
-// MARK: - IMPLEMENTATION
+// MARK: - TRIỂN KHAI
 // ======================================================
 
 private extension AIRecommendationsView {
@@ -1117,7 +1117,7 @@ private extension AIRecommendationsView {
 
 
 // ======================================================
-// MARK: - CALCULATION NOTE
+// MARK: - GHI CHÚ TÍNH TOÁN
 // ======================================================
 
 private extension AIRecommendationsView {
@@ -1175,7 +1175,7 @@ private extension AIRecommendationsView {
 
 
 // ======================================================
-// MARK: - QUOTE
+// MARK: - TRÍCH DẪN
 // ======================================================
 
 private extension AIRecommendationsView {
@@ -1220,7 +1220,7 @@ private extension AIRecommendationsView {
 
 
 // ======================================================
-// MARK: - FORMAT
+// MARK: - ĐỊNH DẠNG
 // ======================================================
 
 private extension AIRecommendationsView {
@@ -1260,7 +1260,7 @@ private extension AIRecommendationsView {
 
 
 // ======================================================
-// MARK: - SOLUTION DETAIL
+// MARK: - CHI TIẾT GIẢI PHÁP
 // ======================================================
 
 struct EnergySolutionDetailView: View {
@@ -1645,7 +1645,7 @@ struct EnergySolutionDetailView: View {
 
 
 // ======================================================
-// MARK: - SOURCE METADATA
+// MARK: - NGUỒN VÀ SIÊU DỮ LIỆU
 // ======================================================
 
 struct SourceMetadataView: View {
@@ -2109,7 +2109,7 @@ struct SourceMetadataView: View {
 
 
 // ======================================================
-// MARK: - ACTION PLAN
+// MARK: - KẾ HOẠCH HÀNH ĐỘNG
 // ======================================================
 
 struct ActionPlanView: View {
@@ -2275,7 +2275,7 @@ struct ActionPlanView: View {
 
 
 // ======================================================
-// MARK: - ACTION HEADER
+// MARK: - TIÊU ĐỀ KẾ HOẠCH
 // ======================================================
 
 private extension ActionPlanView {
@@ -2320,7 +2320,7 @@ private extension ActionPlanView {
 
 
 // ======================================================
-// MARK: - PROGRESS
+// MARK: - TIẾN ĐỘ
 // ======================================================
 
 private extension ActionPlanView {
@@ -2388,7 +2388,7 @@ private extension ActionPlanView {
 
 
 // ======================================================
-// MARK: - TASKS
+// MARK: - CÔNG VIỆC
 // ======================================================
 
 private extension ActionPlanView {
@@ -2571,7 +2571,7 @@ private extension ActionPlanView {
 
 
 // ======================================================
-// MARK: - KPI
+// MARK: - CHỈ SỐ KPI
 // ======================================================
 
 private extension ActionPlanView {
@@ -2679,7 +2679,7 @@ private extension ActionPlanView {
 
 
 // ======================================================
-// MARK: - REMEASURE
+// MARK: - ĐO LẠI
 // ======================================================
 
 private extension ActionPlanView {
@@ -2733,7 +2733,7 @@ private extension ActionPlanView {
 
 
 // ======================================================
-// MARK: - ACTION PLAN MODELS
+// MARK: - MÔ HÌNH KẾ HOẠCH HÀNH ĐỘNG
 // ======================================================
 
 struct ActionPlanTask: Identifiable {

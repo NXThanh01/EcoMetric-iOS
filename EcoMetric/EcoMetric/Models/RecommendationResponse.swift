@@ -2,7 +2,7 @@
 //  RecommendationResponse.swift
 //  EcoMetric
 //
-//  Created by Nguyễn Xuân Thành on 2/10/26.
+//  Được tạo bởi Nguyễn Xuân Thành on 2/10/26.
 //
 
 import Foundation
