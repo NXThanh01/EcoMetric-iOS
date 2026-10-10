@@ -49,7 +49,11 @@ struct RootTabView: View {
                 )
             }
 
-            AIRecommendationsView()
+            AIWorkspaceView(
+                onOpenData: {
+                    selectedTab = .data
+                }
+            )
                 .tag(AppTab.ai)
                 .tabItem {
                     Label(
@@ -58,7 +62,11 @@ struct RootTabView: View {
                     )
                 }
 
-            ReportsView()
+            ReportsView(
+                onOpenData: {
+                    selectedTab = .data
+                }
+            )
                 .tag(AppTab.reports)
                 .tabItem {
                     Label(

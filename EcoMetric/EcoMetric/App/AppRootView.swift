@@ -10,6 +10,8 @@ import SwiftUI
 struct AppRootView: View {
 
     @State private var showSplash = true
+    @StateObject private var analysisStore = AppAnalysisStore()
+    @StateObject private var accountSession = AccountSession()
 
     var body: some View {
 
@@ -20,13 +22,25 @@ struct AppRootView: View {
                 SplashView()
                     .transition(.opacity)
 
-            } else {
+            } else if accountSession.user?.mustChangePassword == true {
+
+                TemporaryPasswordChangeView()
+                    .transition(.opacity)
+
+            } else if accountSession.isAuthenticated {
 
                 RootTabView()
                     .transition(.opacity)
+            } else {
+                AuthenticationView()
+                    .transition(.opacity)
             }
         }
+        .environmentObject(analysisStore)
+        .environmentObject(accountSession)
         .task {
+
+            await accountSession.restore()
 
             try? await Task.sleep(
                 nanoseconds: 1_800_000_000

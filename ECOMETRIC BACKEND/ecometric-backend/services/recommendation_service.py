@@ -4,16 +4,21 @@ from typing import List
 from fastapi import HTTPException
 
 from schemas import (
-    DataQuality,
     EnergyInput,
     RecommendationItem,
     RecommendationListResponse,
     RecommendationSource,
 )
+from services.applicability_service import assess_applicability
 from services.calculators import CALCULATORS
+from services.data_quality_service import assess_data_quality
 from services.knowledge_service import find_solutions
 from services.opportunity_service import analyze_energy_input
+from services.scenario_service import build_scenarios
 from services.scoring_service import score_recommendation
+
+
+ENGINE_VERSION = "1.0.0"
 
 
 def _source_from_knowledge(knowledge: dict) -> RecommendationSource:
@@ -56,6 +61,12 @@ def _assumptions(knowledge: dict) -> List[str]:
 def build_recommendations(
     data: EnergyInput,
 ) -> RecommendationListResponse:
+    if data.proposed_power_w >= data.current_power_w:
+        raise HTTPException(
+            status_code=422,
+            detail="Proposed lamp power must be lower than current lamp power",
+        )
+
     opportunity = analyze_energy_input(data)
     knowledge_records = find_solutions(
         category=opportunity.category,
@@ -75,28 +86,54 @@ def build_recommendations(
         if calculator is None:
             continue
 
-        impact = calculator(data, knowledge)
-        source = _source_from_knowledge(knowledge)
-        applicability = float(knowledge.get("applicability_score", 1))
-        data_confidence = opportunity.confidence
-        assumptions = _assumptions(knowledge)
+        applicability = assess_applicability(data, knowledge)
+        if not applicability.eligible:
+            continue
 
-        if assumptions:
-            data_confidence = min(data_confidence, 0.75)
+        impact = calculator(data, knowledge)
+        scenarios = build_scenarios(impact, knowledge)
+        source = _source_from_knowledge(knowledge)
+        assumptions = _assumptions(knowledge)
+        data_quality = assess_data_quality(data, assumptions)
 
         ranking = score_recommendation(
             impact=impact,
-            confidence=data_confidence,
+            confidence=data_quality.score,
             source_verified=source.verified,
-            applicability=applicability,
+            applicability=applicability.score,
         )
+        priority_label = {
+            "high": "cao",
+            "medium": "trung bình",
+            "low": "thấp",
+        }[ranking.priority]
 
         explanation = (
-            f"Giải pháp có thể tiết kiệm khoảng "
-            f"{impact.energy_saving_kwh_month:.0f} kWh/tháng, "
-            f"tương đương {impact.cost_saving_vnd_year:,.0f} VNĐ/năm. "
-            f"Mức ưu tiên: {ranking.priority}."
+            f"Giải pháp dự kiến tiết kiệm "
+            f"{scenarios.expected.energy_saving_kwh_month:.0f} kWh/tháng. "
+            f"Khoảng tiết kiệm thận trọng đến lạc quan là "
+            f"{scenarios.conservative.cost_saving_vnd_year:,.0f}–"
+            f"{scenarios.optimistic.cost_saving_vnd_year:,.0f} VNĐ/năm. "
+            f"Mức ưu tiên: {priority_label}."
         )
+
+        if impact.investment_vnd == 0:
+            payback_rationale = "Giải pháp không yêu cầu vốn đầu tư trong mô hình hiện tại."
+        else:
+            payback_rationale = (
+                f"Thời gian hoàn vốn kỳ vọng "
+                f"{impact.payback_months:.1f} tháng."
+            )
+
+        rationale = [
+            *applicability.passed_rules,
+            payback_rationale,
+            (
+                "Nguồn kiến thức đã được xác minh."
+                if source.verified
+                else "Nguồn kiến thức chưa được xác minh."
+            ),
+        ]
 
         recommendations.append(
             RecommendationItem(
@@ -113,13 +150,17 @@ def build_recommendations(
                 solution=_solution_title(data, knowledge),
                 implementation_steps=knowledge["implementation_steps"],
                 impact=impact,
+                scenarios=scenarios,
+                applicability=applicability,
                 ranking=ranking,
-                data_quality=DataQuality(
-                    score=data_confidence,
-                    assumptions=assumptions,
-                ),
+                data_quality=data_quality,
                 source=source,
                 explanation=explanation,
+                rationale=rationale,
+                verification_plan=knowledge.get(
+                    "verification_plan",
+                    ["Đo lại dữ liệu sau triển khai và so sánh với đường cơ sở."],
+                ),
             )
         )
 
@@ -135,6 +176,7 @@ def build_recommendations(
     )
 
     return RecommendationListResponse(
+        engine_version=ENGINE_VERSION,
         facility=data.facility_name,
         opportunity=opportunity,
         recommendations=recommendations,

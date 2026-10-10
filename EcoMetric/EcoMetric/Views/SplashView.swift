@@ -106,7 +106,7 @@ struct SplashView: View {
                 )
 
                 Text(
-                    "Dữ liệu hôm nay\nVì một tương lai xanh hơn"
+                    "Biến dữ liệu thành quyết định xanh"
                 )
                 .font(.subheadline)
                 .foregroundStyle(

@@ -1,5 +1,7 @@
 import unittest
 
+from fastapi import HTTPException
+
 from schemas import EnergyInput
 from services.opportunity_service import analyze_energy_input
 from services.recommendation_service import build_recommendations
@@ -74,6 +76,60 @@ class RecommendationEngineTests(unittest.TestCase):
         self.assertEqual(
             schedule.ranking.components["source_quality"],
             30,
+        )
+
+    def test_returns_explainable_savings_scenarios(self):
+        result = build_recommendations(self.input)
+        led = result.recommendations[0]
+
+        self.assertEqual(result.engine_version, "1.0.0")
+        self.assertLess(
+            led.scenarios.conservative.cost_saving_vnd_year,
+            led.scenarios.expected.cost_saving_vnd_year,
+        )
+        self.assertGreater(
+            led.scenarios.optimistic.cost_saving_vnd_year,
+            led.scenarios.expected.cost_saving_vnd_year,
+        )
+        self.assertTrue(led.rationale)
+        self.assertTrue(led.verification_plan)
+
+    def test_filters_solution_when_applicability_rule_fails(self):
+        short_shift = self.input.model_copy(
+            update={"hours_per_day": 6},
+        )
+        result = build_recommendations(short_shift)
+
+        self.assertEqual(len(result.recommendations), 1)
+        self.assertEqual(
+            result.recommendations[0].knowledge_id,
+            "energy_led_001",
+        )
+
+    def test_rejects_when_no_solution_is_applicable(self):
+        unsuitable = self.input.model_copy(
+            update={"hours_per_day": 3},
+        )
+
+        with self.assertRaises(HTTPException) as context:
+            build_recommendations(unsuitable)
+
+        self.assertEqual(context.exception.status_code, 422)
+
+    def test_measured_data_without_duration_lowers_confidence(self):
+        measured = self.input.model_copy(
+            update={
+                "data_source": "measured",
+                "measurement_days": None,
+            },
+        )
+        result = build_recommendations(measured)
+        led = result.recommendations[0]
+
+        self.assertEqual(led.data_quality.score, 0.85)
+        self.assertIn(
+            "measurement_days",
+            led.data_quality.missing_fields,
         )
 
 

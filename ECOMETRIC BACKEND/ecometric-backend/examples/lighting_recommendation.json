@@ -1,0 +1,13 @@
+{
+  "facility_name": "Xưởng 1",
+  "problem_type": "lighting_high_consumption",
+  "lamp_quantity": 100,
+  "current_power_w": 40,
+  "proposed_power_w": 18,
+  "hours_per_day": 16,
+  "days_per_month": 30,
+  "electricity_price_vnd_per_kwh": 2367,
+  "investment_vnd": 15000000,
+  "data_source": "measured",
+  "measurement_days": 30
+}

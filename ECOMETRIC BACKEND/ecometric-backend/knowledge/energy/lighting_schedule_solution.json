@@ -6,6 +6,19 @@
   "solution": "optimize_lighting_schedule",
   "calculator": "lighting_schedule_optimization",
   "applicability_score": 0.8,
+  "applicability_rules": [
+    {
+      "field": "hours_per_day",
+      "operator": "gte",
+      "value": 8,
+      "message": "Hệ thống chiếu sáng vận hành ít nhất 8 giờ mỗi ngày."
+    }
+  ],
+  "scenario_multipliers": {
+    "conservative": 0.5,
+    "expected": 1.0,
+    "optimistic": 1.5
+  },
   "description": "Rà soát thời gian bật đèn và tắt các khu vực không sử dụng để giảm số giờ vận hành không cần thiết.",
   "applicable_when": [
     "Hệ thống chiếu sáng hoạt động trong thời gian dài",
@@ -25,6 +38,11 @@
     "Thiết lập lịch bật và tắt đèn",
     "Phân công người chịu trách nhiệm",
     "Đo lại điện năng sau 30 ngày"
+  ],
+  "verification_plan": [
+    "Theo dõi lịch bật và tắt đèn trong 7 ngày để xác định đường cơ sở.",
+    "Áp dụng lịch vận hành mới trong 30 ngày.",
+    "So sánh điện năng theo cùng số ngày làm việc và ghi nhận phản hồi của người sử dụng."
   ],
   "source": {
     "organization": "Chưa xác nhận",

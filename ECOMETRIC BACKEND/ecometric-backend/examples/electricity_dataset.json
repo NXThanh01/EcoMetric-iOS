@@ -1,0 +1,50 @@
+{
+  "facility_id": "THAY_BANG_ID_CO_SO",
+  "meter_name": "Đồng hồ điện tổng",
+  "source_type": "manual",
+  "interval": "daily",
+  "points": [
+    {
+      "timestamp": "2026-10-01T00:00:00+07:00",
+      "consumption_kwh": 100,
+      "production_units": 10,
+      "operating_hours": 8
+    },
+    {
+      "timestamp": "2026-10-02T00:00:00+07:00",
+      "consumption_kwh": 101,
+      "production_units": 10,
+      "operating_hours": 8
+    },
+    {
+      "timestamp": "2026-10-03T00:00:00+07:00",
+      "consumption_kwh": 99,
+      "production_units": 10,
+      "operating_hours": 8
+    },
+    {
+      "timestamp": "2026-10-04T00:00:00+07:00",
+      "consumption_kwh": 100,
+      "production_units": 10,
+      "operating_hours": 8
+    },
+    {
+      "timestamp": "2026-10-05T00:00:00+07:00",
+      "consumption_kwh": 102,
+      "production_units": 10,
+      "operating_hours": 8
+    },
+    {
+      "timestamp": "2026-10-06T00:00:00+07:00",
+      "consumption_kwh": 98,
+      "production_units": 10,
+      "operating_hours": 8
+    },
+    {
+      "timestamp": "2026-10-07T00:00:00+07:00",
+      "consumption_kwh": 160,
+      "production_units": 10,
+      "operating_hours": 8
+    }
+  ]
+}

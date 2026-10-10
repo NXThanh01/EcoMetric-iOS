@@ -6,6 +6,25 @@
   "solution": "replace_fluorescent_with_led",
   "calculator": "lighting_replacement",
   "applicability_score": 1.0,
+  "applicability_rules": [
+    {
+      "field": "hours_per_day",
+      "operator": "gte",
+      "value": 4,
+      "message": "Hệ thống chiếu sáng vận hành ít nhất 4 giờ mỗi ngày."
+    },
+    {
+      "field": "power_reduction_percent",
+      "operator": "gte",
+      "value": 20,
+      "message": "Phương án LED giảm ít nhất 20% công suất."
+    }
+  ],
+  "scenario_multipliers": {
+    "conservative": 0.9,
+    "expected": 1.0,
+    "optimistic": 1.05
+  },
   "description": "Thay hệ thống chiếu sáng công suất cao bằng đèn LED công suất thấp hơn để giảm điện năng tiêu thụ.",
   "applicable_when": [
     "Hệ thống chiếu sáng hoạt động nhiều giờ mỗi ngày",
@@ -24,6 +43,12 @@
     "Phê duyệt ngân sách",
     "Thay thế hệ thống chiếu sáng",
     "Đo lại điện năng sau triển khai"
+  ],
+  "verification_plan": [
+    "Ghi chỉ số điện của mạch chiếu sáng trong ít nhất 7 ngày trước khi thay đèn.",
+    "Ghi lại số giờ vận hành thực tế và mọi thay đổi về sản lượng.",
+    "Đo lại cùng mạch điện trong ít nhất 7 ngày sau khi thay đèn.",
+    "Chuẩn hóa theo số giờ vận hành rồi so sánh với mức tiết kiệm dự báo."
   ],
   "source": {
     "organization": "VNEEC - Chương trình quốc gia về sử dụng năng lượng tiết kiệm và hiệu quả",

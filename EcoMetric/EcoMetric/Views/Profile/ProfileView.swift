@@ -1,316 +1,149 @@
-//
-//  ProfileView.swift
-//  EcoMetric
-//
-//  Được tạo bởi Nguyễn Xuân Thành on 19/9/26.
-//
-
 import SwiftUI
 
 struct ProfileView: View {
+    @EnvironmentObject private var session: AccountSession
 
     var body: some View {
-
         NavigationStack {
-
             ScrollView {
-
-                VStack(
-                    spacing: 22
-                ) {
-
+                VStack(spacing: 18) {
                     profileHeader
-
                     companyCard
 
-                    settingsSection
+                    if session.canManageMembers {
+                        NavigationLink {
+                            MemberManagementView()
+                        } label: {
+                            managementCard
+                        }
+                        .buttonStyle(.plain)
+                    }
 
-                    aboutSection
+                    permissionsCard
+                    logoutButton
                 }
-                .padding()
+                .padding(16)
+                .padding(.bottom, 24)
             }
-            .background(
-                EcoTheme.background
-                    .ignoresSafeArea()
-            )
-            .navigationTitle(
-                "Tài khoản"
-            )
+            .background(EcoTheme.background.ignoresSafeArea())
+            .navigationTitle("Tài khoản")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 
     private var profileHeader: some View {
+        VStack(spacing: 11) {
+            Text(session.user?.fullName.prefix(1).uppercased() ?? "U")
+                .font(.system(size: 34, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 82, height: 82)
+                .background(EcoTheme.green)
+                .clipShape(Circle())
 
-        VStack(
-            spacing: 12
-        ) {
-
-            ZStack {
-
-                Circle()
-                    .fill(
-                        EcoTheme.lightGreen
-                    )
-                    .frame(
-                        width: 90,
-                        height: 90
-                    )
-
-                Image(
-                    systemName:
-                        "building.2.fill"
-                )
-                .font(
-                    .system(size: 36)
-                )
-                .foregroundStyle(
-                    EcoTheme.green
-                )
-            }
-
-            Text(
-                "EcoMetric Demo"
-            )
-            .font(
-                .title2.bold()
-            )
-            .foregroundStyle(
-                EcoTheme.navy
-            )
-
-            Text(
-                "Tài khoản doanh nghiệp"
-            )
-            .font(.subheadline)
-            .foregroundStyle(
-                .secondary
-            )
+            Text(session.user?.fullName ?? "Người dùng")
+                .font(.title2.bold())
+                .foregroundStyle(EcoTheme.navy)
+            Text(session.user?.email ?? "")
+                .font(.subheadline)
+                .foregroundStyle(EcoTheme.textSecondary)
+            Text(session.user?.role.title ?? "")
+                .font(.caption.bold())
+                .foregroundStyle(EcoTheme.darkGreen)
+                .padding(.horizontal, 11)
+                .padding(.vertical, 6)
+                .background(EcoTheme.lightGreen)
+                .clipShape(Capsule())
         }
-        .frame(
-            maxWidth: .infinity
-        )
+        .frame(maxWidth: .infinity)
     }
 
     private var companyCard: some View {
-
-        VStack(
-            alignment: .leading,
-            spacing: 14
-        ) {
-
-            Text(
-                "Thông tin doanh nghiệp"
-            )
-            .font(
-                .headline
-            )
-
-            infoRow(
-                icon:
-                    "building.fill",
-                title:
-                    "Tên doanh nghiệp",
-                value:
-                    "EcoMetric Demo"
-            )
-
+        VStack(alignment: .leading, spacing: 13) {
+            Label("Doanh nghiệp", systemImage: "building.2.fill")
+                .font(.headline)
+                .foregroundStyle(EcoTheme.navy)
+            infoRow("Tên công ty", session.organization?.name ?? "—")
             Divider()
-
-            infoRow(
-                icon:
-                    "location.fill",
-                title:
-                    "Khu vực",
-                value:
-                    "Việt Nam"
-            )
-
+            infoRow("Gói dịch vụ", (session.organization?.planCode ?? "—").uppercased())
             Divider()
-
             infoRow(
-                icon:
-                    "leaf.fill",
-                title:
-                    "Mục tiêu",
-                value:
-                    "Giảm phát thải"
+                "Trạng thái",
+                session.organization?.subscriptionStatus == "active"
+                    ? "Đang hoạt động"
+                    : "Chưa kích hoạt"
             )
         }
-        .padding()
-        .background(
-            .white
-        )
-        .clipShape(
-            RoundedRectangle(
-                cornerRadius: 18
-            )
-        )
+        .accountCard()
     }
 
-    private var settingsSection: some View {
-
-        VStack(
-            alignment: .leading,
-            spacing: 12
-        ) {
-
-            Text(
-                "Cài đặt"
-            )
-            .font(.headline)
-
-            settingsRow(
-                icon:
-                    "bell.fill",
-                title:
-                    "Thông báo"
-            )
-
-            settingsRow(
-                icon:
-                    "slider.horizontal.3",
-                title:
-                    "Tùy chỉnh dữ liệu"
-            )
-
-            settingsRow(
-                icon:
-                    "lock.fill",
-                title:
-                    "Bảo mật"
-            )
-        }
-    }
-
-    private var aboutSection: some View {
-
-        VStack(
-            alignment: .leading,
-            spacing: 12
-        ) {
-
-            Text(
-                "Khác"
-            )
-            .font(.headline)
-
-            settingsRow(
-                icon:
-                    "questionmark.circle.fill",
-                title:
-                    "Trợ giúp"
-            )
-
-            settingsRow(
-                icon:
-                    "info.circle.fill",
-                title:
-                    "Giới thiệu EcoMetric"
-            )
-        }
-    }
-
-    private func infoRow(
-        icon: String,
-        title: String,
-        value: String
-    ) -> some View {
-
-        HStack {
-
-            Image(
-                systemName:
-                    icon
-            )
-            .foregroundStyle(
-                EcoTheme.green
-            )
-            .frame(
-                width: 30
-            )
-
-            VStack(
-                alignment: .leading,
-                spacing: 2
-            ) {
-
-                Text(
-                    title
-                )
-                .font(.caption)
-                .foregroundStyle(
-                    .secondary
-                )
-
-                Text(
-                    value
-                )
-                .font(
-                    .subheadline.bold()
-                )
-                .foregroundStyle(
-                    EcoTheme.navy
-                )
+    private var managementCard: some View {
+        HStack(spacing: 13) {
+            Image(systemName: "person.3.fill")
+                .font(.title2)
+                .foregroundStyle(EcoTheme.blue)
+                .frame(width: 46, height: 46)
+                .background(EcoTheme.lightBlue)
+                .clipShape(RoundedRectangle(cornerRadius: 13))
+            VStack(alignment: .leading, spacing: 3) {
+                Text("Quản lý thành viên")
+                    .font(.headline)
+                    .foregroundStyle(EcoTheme.textPrimary)
+                Text("Thêm nhân viên và phân quyền bằng email")
+                    .font(.caption)
+                    .foregroundStyle(EcoTheme.textSecondary)
             }
-
             Spacer()
+            Image(systemName: "chevron.right")
+                .foregroundStyle(EcoTheme.textSecondary)
         }
+        .accountCard()
     }
 
-    private func settingsRow(
-        icon: String,
-        title: String
-    ) -> some View {
-
-        HStack {
-
-            ZStack {
-
-                RoundedRectangle(
-                    cornerRadius: 10
-                )
-                .fill(
-                    EcoTheme.lightBlue
-                )
-                .frame(
-                    width: 40,
-                    height: 40
-                )
-
-                Image(
-                    systemName:
-                        icon
-                )
-                .foregroundStyle(
-                    EcoTheme.blue
-                )
-            }
-
-            Text(
-                title
-            )
-            .foregroundStyle(
-                EcoTheme.navy
-            )
-
-            Spacer()
-
-            Image(
-                systemName:
-                    "chevron.right"
-            )
-            .foregroundStyle(
-                .secondary
-            )
+    private var permissionsCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("Quyền hiện tại", systemImage: "checkmark.shield.fill")
+                .font(.headline)
+                .foregroundStyle(EcoTheme.navy)
+            Text(session.user?.role.description ?? "")
+                .font(.subheadline)
+                .foregroundStyle(EcoTheme.textSecondary)
         }
-        .padding()
-        .background(
-            .white
-        )
-        .clipShape(
-            RoundedRectangle(
-                cornerRadius: 14
-            )
-        )
+        .accountCard()
+    }
+
+    private var logoutButton: some View {
+        Button(role: .destructive) {
+            Task { await session.logout() }
+        } label: {
+            Label("Đăng xuất", systemImage: "rectangle.portrait.and.arrow.right")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.red)
+        .background(Color.red.opacity(0.07))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+
+    private func infoRow(_ title: String, _ value: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.subheadline)
+                .foregroundStyle(EcoTheme.textSecondary)
+            Spacer()
+            Text(value)
+                .font(.subheadline.bold())
+                .foregroundStyle(EcoTheme.textPrimary)
+        }
+    }
+}
+
+private extension View {
+    func accountCard() -> some View {
+        padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 18))
     }
 }

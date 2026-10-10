@@ -34,6 +34,32 @@ private struct RecommendationRequest: Encodable {
     let daysPerMonth: Double
     let electricityPriceVNDPerKWh: Double
     let investmentVND: Double
+    let dataSource: String
+    let measurementDays: Int?
+
+    init(input: EnergyCaseInput) {
+        facilityName = input.facilityName
+        problemType = "lighting_high_consumption"
+        lampQuantity = input.lampQuantity
+        currentPowerW = input.currentLampPowerW
+        proposedPowerW = input.proposedLampPowerW
+        hoursPerDay = input.operatingHoursPerDay
+        daysPerMonth = input.operatingDaysPerMonth
+        electricityPriceVNDPerKWh = input.electricityPriceVNDPerKWh
+        investmentVND = input.investmentVND
+
+        switch input.dataOrigin {
+        case .experimental:
+            dataSource = "measured"
+            measurementDays = Int(input.operatingDaysPerMonth)
+        case .illustrative:
+            dataSource = "demo"
+            measurementDays = nil
+        case .calculated, .externalSource:
+            dataSource = "estimated"
+            measurementDays = nil
+        }
+    }
 
     enum CodingKeys: String, CodingKey {
         case facilityName = "facility_name"
@@ -45,10 +71,12 @@ private struct RecommendationRequest: Encodable {
         case daysPerMonth = "days_per_month"
         case electricityPriceVNDPerKWh = "electricity_price_vnd_per_kwh"
         case investmentVND = "investment_vnd"
+        case dataSource = "data_source"
+        case measurementDays = "measurement_days"
     }
 }
 
-private struct APIErrorResponse: Decodable {
+struct APIErrorResponse: Decodable {
     let detail: String?
 }
 
@@ -73,7 +101,51 @@ struct AIRecommendationAPIService {
     func getRecommendation(
         input: EnergyCaseInput
     ) async throws -> RecommendationResponse {
-        let url = baseURL.appendingPathComponent("recommend")
+        try await post(
+            path: "recommend",
+            input: input,
+            responseType: RecommendationResponse.self
+        )
+    }
+
+    func getRankedRecommendations(
+        input: EnergyCaseInput
+    ) async throws -> RankedRecommendationResponse {
+        try await post(
+            path: "recommendations",
+            input: input,
+            responseType: RankedRecommendationResponse.self
+        )
+    }
+
+    func analyzeTimeSeries(
+        input: EnergyTimeSeriesCase
+    ) async throws -> EnergyTimeSeriesAnalysisResponse {
+        try await postPayload(
+            path: "analyze/time-series",
+            payload: input,
+            responseType: EnergyTimeSeriesAnalysisResponse.self
+        )
+    }
+
+    private func post<Response: Decodable>(
+        path: String,
+        input: EnergyCaseInput,
+        responseType: Response.Type
+    ) async throws -> Response {
+        try await postPayload(
+            path: path,
+            payload: RecommendationRequest(input: input),
+            responseType: responseType
+        )
+    }
+
+    private func postPayload<Payload: Encodable, Response: Decodable>(
+        path: String,
+        payload: Payload,
+        responseType: Response.Type
+    ) async throws -> Response {
+        let url = baseURL.appendingPathComponent(path)
         guard url.scheme != nil else {
             throw AIRecommendationAPIError.invalidBaseURL
         }
@@ -85,19 +157,7 @@ struct AIRecommendationAPIService {
             "application/json",
             forHTTPHeaderField: "Content-Type"
         )
-        request.httpBody = try JSONEncoder().encode(
-            RecommendationRequest(
-                facilityName: input.facilityName,
-                problemType: "lighting_high_consumption",
-                lampQuantity: input.lampQuantity,
-                currentPowerW: input.currentLampPowerW,
-                proposedPowerW: input.proposedLampPowerW,
-                hoursPerDay: input.operatingHoursPerDay,
-                daysPerMonth: input.operatingDaysPerMonth,
-                electricityPriceVNDPerKWh: input.electricityPriceVNDPerKWh,
-                investmentVND: input.investmentVND
-            )
-        )
+        request.httpBody = try JSONEncoder().encode(payload)
 
         let (data, response) = try await session.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse else {
@@ -115,7 +175,7 @@ struct AIRecommendationAPIService {
         }
 
         return try JSONDecoder().decode(
-            RecommendationResponse.self,
+            responseType,
             from: data
         )
     }

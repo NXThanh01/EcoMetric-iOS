@@ -12,6 +12,8 @@ import Combine
 final class AIRecommendationViewModel: ObservableObject {
 
     @Published var recommendation: RecommendationResponse?
+    @Published var rankedResponse: RankedRecommendationResponse?
+    @Published var timeSeriesAnalysis: EnergyTimeSeriesAnalysisResponse?
     @Published var isLoading = false
     @Published var errorMessage: String?
 
@@ -33,15 +35,35 @@ final class AIRecommendationViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
 
+        async let recommendationTask = service.getRankedRecommendations(
+            input: .workshop1LEDCase
+        )
+        async let timeSeriesTask = service.analyzeTimeSeries(
+            input: .workshop1Demo
+        )
+
         do {
 
-            recommendation = try await service.getRecommendation(
-                input: .workshop1LEDCase
-            )
+            let response = try await recommendationTask
+            rankedResponse = response
+            recommendation = response
+                .recommendations
+                .first?
+                .compatibilityResponse
 
         } catch {
 
+            rankedResponse = nil
             errorMessage = error.localizedDescription
+        }
+
+        do {
+
+            timeSeriesAnalysis = try await timeSeriesTask
+
+        } catch {
+
+            timeSeriesAnalysis = nil
         }
 
         isLoading = false

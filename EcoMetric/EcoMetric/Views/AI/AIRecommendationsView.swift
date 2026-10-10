@@ -79,6 +79,34 @@ struct AIRecommendationsView: View {
         ?? input.dataOrigin.rawValue
     }
 
+    private var topRankedRecommendation: RankedRecommendation? {
+        apiViewModel.rankedResponse?
+            .recommendations
+            .first
+    }
+
+    private var alternativeRecommendations: [RankedRecommendation] {
+        guard let recommendations = apiViewModel
+            .rankedResponse?
+            .recommendations else {
+            return []
+        }
+        return Array(recommendations.dropFirst())
+    }
+
+    private var priorityLabel: String {
+        switch topRankedRecommendation?.ranking.priority {
+        case "high":
+            return "ƯU TIÊN CAO"
+        case "medium":
+            return "ƯU TIÊN VỪA"
+        case "low":
+            return "ƯU TIÊN THẤP"
+        default:
+            return "ĐANG ĐÁNH GIÁ"
+        }
+    }
+
     private var firstYearROI: Double {
         guard investmentVND > 0 else {
             return 0
@@ -145,9 +173,15 @@ struct AIRecommendationsView: View {
 
                     aiInsightCard
 
+                    aiEvidenceCard
+
+                    anomalyInsightCard
+
                     priorityTitle
 
                     solutionCard
+
+                    alternativeSolutions
 
                     calculationNote
 
@@ -165,6 +199,134 @@ struct AIRecommendationsView: View {
                 await apiViewModel
                     .loadRecommendation()
             }
+        }
+    }
+}
+
+
+// ======================================================
+// MARK: - PHÁT HIỆN BẤT THƯỜNG
+// ======================================================
+
+private extension AIRecommendationsView {
+
+    @ViewBuilder
+    var anomalyInsightCard: some View {
+
+        if let analysis = apiViewModel.timeSeriesAnalysis {
+
+            VStack(
+                alignment: .leading,
+                spacing: 14
+            ) {
+
+                HStack {
+
+                    Label(
+                        "Giám sát bất thường",
+                        systemImage: "waveform.path.ecg"
+                    )
+                    .font(.headline)
+                    .foregroundStyle(EcoTheme.navy)
+
+                    Spacer()
+
+                    Text("Engine \(analysis.engineVersion)")
+                        .font(.caption2.bold())
+                        .foregroundStyle(EcoTheme.blue)
+                }
+
+                if let anomaly = analysis.anomalies.first {
+
+                    HStack(spacing: 12) {
+
+                        ZStack {
+
+                            Circle()
+                                .fill(Color.orange.opacity(0.14))
+                                .frame(width: 46, height: 46)
+
+                            Image(
+                                systemName: "exclamationmark.bolt.fill"
+                            )
+                            .foregroundStyle(.orange)
+                        }
+
+                        VStack(
+                            alignment: .leading,
+                            spacing: 3
+                        ) {
+
+                            Text(
+                                "Phát hiện \(analysis.anomalies.count) kỳ bất thường"
+                            )
+                            .font(.subheadline.bold())
+                            .foregroundStyle(EcoTheme.navy)
+
+                            Text(anomaly.reason)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    HStack(spacing: 10) {
+
+                        aiMetric(
+                            title: "Điện vượt mức",
+                            value: "\(number(anomaly.excessKWh)) kWh"
+                        )
+
+                        aiMetric(
+                            title: "Sai lệch",
+                            value: "\(Int(anomaly.deviationPercent))%"
+                        )
+
+                        aiMetric(
+                            title: "Tin cậy",
+                            value: "\(Int(analysis.confidence * 100))%"
+                        )
+                    }
+
+                    Text(
+                        "Đường cơ sở đã được chuẩn hóa theo \(baselineLabel(analysis.baseline.normalizedBy))."
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                } else {
+
+                    Label(
+                        "Chưa phát hiện mức tiêu thụ bất thường.",
+                        systemImage: "checkmark.circle.fill"
+                    )
+                    .font(.subheadline)
+                    .foregroundStyle(EcoTheme.darkGreen)
+                }
+            }
+            .padding()
+            .background(Color.white)
+            .clipShape(
+                RoundedRectangle(cornerRadius: 22)
+            )
+            .overlay {
+
+                RoundedRectangle(cornerRadius: 22)
+                    .stroke(
+                        Color.orange.opacity(0.16),
+                        lineWidth: 1
+                    )
+            }
+        }
+    }
+
+    func baselineLabel(_ value: String) -> String {
+        switch value {
+        case "production_units":
+            return "sản lượng"
+        case "operating_hours":
+            return "giờ vận hành"
+        default:
+            return "điện năng tiêu thụ"
         }
     }
 }
@@ -436,7 +598,7 @@ private extension AIRecommendationsView {
 
                 Spacer()
 
-                Text("ƯU TIÊN CAO")
+                Text(priorityLabel)
                     .font(
                         .caption2.bold()
                     )
@@ -503,6 +665,151 @@ private extension AIRecommendationsView {
                 .black.opacity(0.05),
             radius: 10,
             y: 5
+        )
+    }
+}
+
+
+// ======================================================
+// MARK: - BẰNG CHỨNG XẾP HẠNG
+// ======================================================
+
+private extension AIRecommendationsView {
+
+    @ViewBuilder
+    var aiEvidenceCard: some View {
+
+        if let item = topRankedRecommendation,
+           let response = apiViewModel.rankedResponse {
+
+            VStack(
+                alignment: .leading,
+                spacing: 14
+            ) {
+
+                HStack {
+
+                    Label(
+                        "AI Engine \(response.engineVersion)",
+                        systemImage: "checkmark.shield.fill"
+                    )
+                    .font(.caption.bold())
+                    .foregroundStyle(EcoTheme.darkGreen)
+
+                    Spacer()
+
+                    Text(
+                        "\(response.recommendations.count) phương án"
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+
+                HStack(spacing: 10) {
+
+                    aiMetric(
+                        title: "Điểm AI",
+                        value: item.ranking.score.formatted(
+                            .number.precision(.fractionLength(1))
+                        )
+                    )
+
+                    aiMetric(
+                        title: "Tin cậy",
+                        value: "\(Int(item.dataQuality.score * 100))%"
+                    )
+
+                    aiMetric(
+                        title: "Phù hợp",
+                        value: "\(Int(item.applicability.score * 100))%"
+                    )
+                }
+
+                Text(item.explanation)
+                    .font(.subheadline)
+                    .foregroundStyle(EcoTheme.navy)
+
+                VStack(
+                    alignment: .leading,
+                    spacing: 8
+                ) {
+
+                    ForEach(
+                        Array(item.rationale.prefix(3)),
+                        id: \.self
+                    ) { reason in
+
+                        Label(
+                            reason,
+                            systemImage: "checkmark.circle.fill"
+                        )
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    }
+                }
+
+                HStack {
+
+                    VStack(
+                        alignment: .leading,
+                        spacing: 3
+                    ) {
+
+                        Text("Khoảng tiết kiệm năm")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+
+                        Text(
+                            "\(moneyShort(item.scenarios.conservative.costSavingVNDYear)) – \(moneyShort(item.scenarios.optimistic.costSavingVNDYear))"
+                        )
+                        .font(.subheadline.bold())
+                        .foregroundStyle(EcoTheme.darkGreen)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .foregroundStyle(EcoTheme.green)
+                }
+                .padding(12)
+                .background(EcoTheme.lightGreen)
+                .clipShape(
+                    RoundedRectangle(cornerRadius: 14)
+                )
+            }
+            .padding()
+            .background(Color.white)
+            .clipShape(
+                RoundedRectangle(cornerRadius: 22)
+            )
+            .shadow(
+                color: .black.opacity(0.05),
+                radius: 10,
+                y: 5
+            )
+        }
+    }
+
+    func aiMetric(
+        title: String,
+        value: String
+    ) -> some View {
+
+        VStack(spacing: 4) {
+
+            Text(value)
+                .font(.headline)
+                .foregroundStyle(EcoTheme.navy)
+
+            Text(title)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .background(EcoTheme.background)
+        .clipShape(
+            RoundedRectangle(cornerRadius: 12)
         )
     }
 }
@@ -702,6 +1009,103 @@ private extension AIRecommendationsView {
             )
         }
         .buttonStyle(.plain)
+    }
+}
+
+
+// ======================================================
+// MARK: - PHƯƠNG ÁN BỔ SUNG
+// ======================================================
+
+private extension AIRecommendationsView {
+
+    @ViewBuilder
+    var alternativeSolutions: some View {
+
+        if !alternativeRecommendations.isEmpty {
+
+            VStack(
+                alignment: .leading,
+                spacing: 12
+            ) {
+
+                Text("Phương án bổ sung")
+                    .font(.headline)
+                    .foregroundStyle(EcoTheme.navy)
+
+                Text(
+                    "Các giải pháp được AI xếp hạng thấp hơn nhưng vẫn có thể triển khai."
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+                ForEach(alternativeRecommendations) { item in
+
+                    VStack(
+                        alignment: .leading,
+                        spacing: 10
+                    ) {
+
+                        HStack {
+
+                            Text(item.solution)
+                                .font(.subheadline.bold())
+                                .foregroundStyle(EcoTheme.navy)
+
+                            Spacer()
+
+                            Text(
+                                "\(item.ranking.score.formatted(.number.precision(.fractionLength(1)))) điểm"
+                            )
+                            .font(.caption.bold())
+                            .foregroundStyle(EcoTheme.blue)
+                        }
+
+                        Text(item.explanation)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+
+                        HStack {
+
+                            Label(
+                                "\(moneyShort(item.impact.costSavingVNDYear))/năm",
+                                systemImage: "banknote.fill"
+                            )
+
+                            Spacer()
+
+                            Label(
+                                item.source.verified
+                                ? "Đã xác minh"
+                                : "Cần xác minh",
+                                systemImage: item.source.verified
+                                ? "checkmark.seal.fill"
+                                : "exclamationmark.triangle.fill"
+                            )
+                        }
+                        .font(.caption)
+                        .foregroundStyle(
+                            item.source.verified
+                            ? EcoTheme.darkGreen
+                            : .orange
+                        )
+                    }
+                    .padding()
+                    .background(Color.white)
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: 18)
+                    )
+                    .overlay {
+
+                        RoundedRectangle(cornerRadius: 18)
+                            .stroke(
+                                EcoTheme.blue.opacity(0.12),
+                                lineWidth: 1
+                            )
+                    }
+                }
+            }
+        }
     }
 }
 
