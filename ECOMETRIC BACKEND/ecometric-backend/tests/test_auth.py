@@ -1,5 +1,6 @@
 import os
 import unittest
+from datetime import datetime, timedelta, timezone
 
 from fastapi import HTTPException
 from sqlalchemy import create_engine, event
@@ -16,8 +17,10 @@ from auth_schemas import (  # noqa: E402
     PasswordChangeRequest,
 )
 from database import Base  # noqa: E402
+from db_models import AuthSession, User  # noqa: E402
 from main import ready_user  # noqa: E402
 from services.auth_service import (  # noqa: E402
+    AuthenticationError,
     AuthorizationError,
     OTPRateLimitError,
     OTPVerificationError,
@@ -144,6 +147,44 @@ class AuthenticationTests(unittest.TestCase):
             self.assertEqual(current.organization.name, "Công ty Xanh")
             self.assertTrue(logged_in.access_token)
 
+    def test_login_is_temporarily_locked_after_repeated_failures(self):
+        with self.session_factory() as session:
+            auth = self._create_owner(session)
+
+            for _ in range(5):
+                with self.assertRaises(AuthenticationError):
+                    login(
+                        session,
+                        LoginRequest(
+                            email="owner@example.com",
+                            password="SaiMatKhau123",
+                        ),
+                    )
+
+            with self.assertRaises(AuthenticationError):
+                login(
+                    session,
+                    LoginRequest(
+                        email="owner@example.com",
+                        password="MatKhau123",
+                    ),
+                )
+
+            stored_owner = session.get(User, auth.user.id)
+            stored_owner.locked_until = datetime.now(timezone.utc) - timedelta(seconds=1)
+            session.commit()
+            logged_in = login(
+                session,
+                LoginRequest(
+                    email="owner@example.com",
+                    password="MatKhau123",
+                ),
+            )
+            self.assertTrue(logged_in.access_token)
+            session.refresh(stored_owner)
+            self.assertEqual(stored_owner.failed_login_attempts, 0)
+            self.assertIsNone(stored_owner.locked_until)
+
     def test_owner_can_promote_employee_to_admin(self):
         with self.session_factory() as session:
             auth = self._create_owner(session)
@@ -237,6 +278,36 @@ class AuthenticationTests(unittest.TestCase):
             )
 
             self.assertFalse(logged_in.user.must_change_password)
+
+    def test_changing_password_revokes_other_sessions(self):
+        with self.session_factory() as session:
+            auth = self._create_owner(session)
+            owner = get_user_by_token(session, auth.access_token)
+            other = login(
+                session,
+                LoginRequest(
+                    email="owner@example.com",
+                    password="MatKhau123",
+                ),
+            )
+
+            change_password(
+                session,
+                owner,
+                PasswordChangeRequest(
+                    current_password="MatKhau123",
+                    new_password="MatKhauMoi123",
+                ),
+                current_token=auth.access_token,
+            )
+
+            self.assertIsNotNone(get_user_by_token(session, auth.access_token))
+            with self.assertRaises(AuthenticationError):
+                get_user_by_token(session, other.access_token)
+            self.assertEqual(
+                session.query(AuthSession).filter_by(user_id=owner.id).count(),
+                1,
+            )
 
     def test_employee_cannot_use_business_api_before_password_change(self):
         with self.session_factory() as session:

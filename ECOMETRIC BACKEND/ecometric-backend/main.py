@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
@@ -88,16 +88,34 @@ from services.email_service import EmailDeliveryError
 from settings import get_settings
 
 
+settings = get_settings()
+is_production = settings.app_environment == "production"
+
 app = FastAPI(
     title="EcoMetric API",
     description=(
         "Time-series anomaly detection, knowledge retrieval, scoring, "
         "and calculation engine for EcoMetric."
     ),
-    version="1.3.0",
+    version="1.3.1",
+    docs_url=None if is_production else "/docs",
+    redoc_url=None if is_production else "/redoc",
+    openapi_url=None if is_production else "/openapi.json",
 )
 
 bearer_scheme = HTTPBearer(auto_error=False)
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    if request.url.path.startswith("/v1/auth"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 def current_user(
@@ -229,11 +247,12 @@ def logout_account(
 @app.post("/v1/auth/change-password", response_model=MessageResponse)
 def change_account_password(
     data: PasswordChangeRequest,
+    token: str = Depends(bearer_token),
     user: User = Depends(current_user),
     db: Session = Depends(get_db),
 ) -> MessageResponse:
     try:
-        change_password(db, user, data)
+        change_password(db, user, data, current_token=token)
         return MessageResponse(message="Mật khẩu đã được cập nhật")
     except AuthenticationError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error

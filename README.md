@@ -285,6 +285,7 @@ Mở `.env` và điền thông tin PostgreSQL cùng Gemini API key. Không commi
 
 ```text
 ECOMETRIC_DB_HOST=127.0.0.1
+ECOMETRIC_APP_ENVIRONMENT=development
 ECOMETRIC_DB_PORT=5432
 ECOMETRIC_DB_NAME=ecometric_dev
 ECOMETRIC_DB_USER=ecometric_app
@@ -301,6 +302,8 @@ ECOMETRIC_SMTP_FROM_EMAIL=
 ECOMETRIC_SMTP_USE_TLS=true
 ECOMETRIC_OTP_SECRET=chuoi_bi_mat_ngau_nhien
 ```
+
+Khi triển khai thật, đổi `ECOMETRIC_APP_ENVIRONMENT=production` và tạo OTP secret riêng dài tối thiểu 32 ký tự, ví dụ bằng `openssl rand -hex 32`. Production sẽ từ chối khởi động nếu dùng email console, thiếu SMTP hoặc OTP secret yếu/trùng mật khẩu database. Swagger `/docs` và OpenAPI cũng được tắt tự động.
 
 Tạo cấu trúc database và chạy API:
 
@@ -398,6 +401,8 @@ Chatbot trong tab Báo cáo dùng đúng dataset đã lưu, kết quả Engine, 
 ## 🔐 Quản lý bí mật
 
 - Chỉ đặt mật khẩu PostgreSQL, Gemini API key, SMTP App Password và OTP secret trong `.env` local.
+- Sau 5 lần đăng nhập sai, tài khoản bị khóa tạm 15 phút; đổi mật khẩu sẽ thu hồi mọi phiên khác của tài khoản.
+- Phản hồi xác thực không được cache và có các header chống nhúng trang, đoán kiểu nội dung và truy cập quyền trình duyệt không cần thiết.
 - `.env` đã được Git bỏ qua; `.env.example` chỉ chứa giá trị rỗng hoặc chuỗi minh họa.
 - Nếu GitHub/GitGuardian báo lộ bí mật, hãy **thu hồi credential tại nhà cung cấp trước**, tạo credential mới, cập nhật `.env`, sau đó mới xử lý lịch sử Git. Xóa một dòng ở commit mới không làm bí mật biến mất khỏi các commit cũ.
 

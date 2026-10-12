@@ -74,6 +74,7 @@ Khi phát triển local, `ECOMETRIC_EMAIL_DELIVERY_MODE=console` ghi OTP vào lo
 Để gửi email thật, đặt các biến sau trong `.env`:
 
 ```text
+ECOMETRIC_APP_ENVIRONMENT=development
 ECOMETRIC_EMAIL_DELIVERY_MODE=smtp
 ECOMETRIC_SMTP_HOST=smtp.gmail.com
 ECOMETRIC_SMTP_PORT=587
@@ -86,6 +87,8 @@ ECOMETRIC_OTP_SECRET=chuoi_bi_mat_ngau_nhien
 ```
 
 Với Gmail, `SMTP_PASSWORD` phải là App Password, không phải mật khẩu đăng nhập Google. OTP hết hạn sau 10 phút, khóa sau 5 lần nhập sai và có thời gian chờ gửi lại 60 giây.
+
+Khi triển khai thật, đặt `ECOMETRIC_APP_ENVIRONMENT=production` và dùng OTP secret riêng dài tối thiểu 32 ký tự. Có thể tạo bằng `openssl rand -hex 32`. Backend sẽ không khởi động nếu production còn dùng email console, thiếu SMTP, OTP secret yếu hoặc OTP secret trùng mật khẩu database. Tài khoản khóa tạm 15 phút sau 5 lần đăng nhập sai; khi đổi mật khẩu, mọi phiên khác sẽ bị thu hồi. Swagger và OpenAPI chỉ mở ở môi trường phát triển.
 
 Khi tạo thành viên, backend chỉ commit tài khoản sau khi SMTP chấp nhận thư mời. Thư bao gồm công ty, vai trò và mật khẩu tạm có hiệu lực 24 giờ. Lần đăng nhập đầu tiên chỉ mở màn hình đổi mật khẩu; sau khi đổi thành công nhân viên mới truy cập ứng dụng.
 
@@ -234,6 +237,6 @@ Các nguyên nhân được trình bày dưới dạng giả thuyết, không ph
 python -m unittest discover -s tests -v
 ```
 
-Phiên bản hiện tại có 34 kiểm thử backend, bao gồm nội dung email OTP và thư mời, mật khẩu tạm, khóa API trước khi đổi mật khẩu, phân quyền, cô lập dữ liệu doanh nghiệp, persistence, bối cảnh vận hành, phân tích chuỗi thời gian, recommendation engine, structured Gemini response và cố vấn theo dataset.
+Phiên bản hiện tại có 36 kiểm thử backend, bao gồm nội dung email OTP và thư mời, mật khẩu tạm, khóa đăng nhập, thu hồi phiên cũ, khóa API trước khi đổi mật khẩu, phân quyền, cô lập dữ liệu doanh nghiệp, persistence, bối cảnh vận hành, phân tích chuỗi thời gian, recommendation engine, structured Gemini response và cố vấn theo dataset.
 
 Hiện Time-series Engine v1.2 hỗ trợ phát hiện bất thường, chẩn đoán có giải thích và đề xuất hành động kiểm chứng. Recommendation Engine hỗ trợ thay đèn công suất cao bằng LED và tối ưu lịch vận hành chiếu sáng. Knowledge base lò hơi mới chỉ có nội dung tham chiếu, chưa có calculation engine tương ứng.

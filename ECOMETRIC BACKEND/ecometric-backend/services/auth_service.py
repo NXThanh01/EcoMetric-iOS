@@ -44,11 +44,15 @@ class OTPRateLimitError(Exception):
 
 
 PASSWORD_ITERATIONS = 600_000
+MIN_PASSWORD_ITERATIONS = 100_000
+MAX_PASSWORD_ITERATIONS = 1_000_000
 SESSION_DURATION_DAYS = 30
 TEMPORARY_PASSWORD_HOURS = 24
 OTP_TTL_MINUTES = 10
 OTP_RESEND_SECONDS = 60
 OTP_MAX_ATTEMPTS = 5
+LOGIN_MAX_ATTEMPTS = 5
+LOGIN_LOCK_MINUTES = 15
 
 
 @dataclass(frozen=True)
@@ -179,17 +183,24 @@ def verify_password(password: str, encoded: str) -> bool:
         algorithm, iterations, salt_text, digest_text = encoded.split("$", 3)
         if algorithm != "pbkdf2_sha256":
             return False
+        iteration_count = int(iterations)
+        if not MIN_PASSWORD_ITERATIONS <= iteration_count <= MAX_PASSWORD_ITERATIONS:
+            return False
         salt = base64.urlsafe_b64decode(salt_text.encode("ascii"))
         expected = base64.urlsafe_b64decode(digest_text.encode("ascii"))
         actual = hashlib.pbkdf2_hmac(
             "sha256",
             password.encode("utf-8"),
             salt,
-            int(iterations),
+            iteration_count,
         )
         return hmac.compare_digest(actual, expected)
     except (ValueError, TypeError):
         return False
+
+
+# Mật khẩu giả giúp thời gian phản hồi gần nhau dù email không tồn tại.
+DUMMY_PASSWORD_HASH = hash_password("mat-khau-gia-khong-dung")
 
 
 def _issue_session(session: Session, user: User) -> AuthResponse:
@@ -245,7 +256,28 @@ def login(session: Session, data: LoginRequest) -> AuthResponse:
         .options(selectinload(User.organization))
         .where(User.email == _normalized_email(data.email))
     )
-    if user is None or not verify_password(data.password, user.password_hash):
+    if user is None:
+        verify_password(data.password, DUMMY_PASSWORD_HASH)
+        raise AuthenticationError("Email hoặc mật khẩu không đúng")
+    now = datetime.now(timezone.utc)
+    locked_until = user.locked_until
+    if locked_until is not None and locked_until.tzinfo is None:
+        locked_until = locked_until.replace(tzinfo=timezone.utc)
+    if locked_until is not None and locked_until > now:
+        verify_password(data.password, user.password_hash)
+        raise AuthenticationError(
+            "Đăng nhập tạm khóa do nhập sai nhiều lần. Vui lòng thử lại sau"
+        )
+    if locked_until is not None:
+        user.locked_until = None
+        user.failed_login_attempts = 0
+
+    if not verify_password(data.password, user.password_hash):
+        user.failed_login_attempts += 1
+        if user.failed_login_attempts >= LOGIN_MAX_ATTEMPTS:
+            user.locked_until = now + timedelta(minutes=LOGIN_LOCK_MINUTES)
+            user.failed_login_attempts = 0
+        session.commit()
         raise AuthenticationError("Email hoặc mật khẩu không đúng")
     if not user.is_active:
         raise AuthenticationError("Tài khoản đã bị vô hiệu hóa")
@@ -257,6 +289,8 @@ def login(session: Session, data: LoginRequest) -> AuthResponse:
             raise AuthenticationError(
                 "Mật khẩu tạm đã hết hạn. Vui lòng liên hệ quản trị viên"
             )
+    user.failed_login_attempts = 0
+    user.locked_until = None
     return _issue_session(session, user)
 
 
@@ -368,6 +402,7 @@ def change_password(
     session: Session,
     user: User,
     data: PasswordChangeRequest,
+    current_token: Optional[str] = None,
 ) -> None:
     if not verify_password(data.current_password, user.password_hash):
         raise AuthenticationError("Mật khẩu hiện tại không đúng")
@@ -376,6 +411,18 @@ def change_password(
     user.password_hash = hash_password(data.new_password)
     user.must_change_password = False
     user.temporary_password_expires_at = None
+    if current_token is not None:
+        current_token_hash = hashlib.sha256(
+            current_token.encode("utf-8")
+        ).hexdigest()
+        session.query(AuthSession).filter(
+            AuthSession.user_id == user.id,
+            AuthSession.token_hash != current_token_hash,
+        ).delete(synchronize_session=False)
+    else:
+        session.query(AuthSession).filter(AuthSession.user_id == user.id).delete(
+            synchronize_session=False
+        )
     session.commit()
 
 
