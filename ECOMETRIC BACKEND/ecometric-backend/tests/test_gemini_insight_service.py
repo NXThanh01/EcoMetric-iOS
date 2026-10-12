@@ -2,7 +2,7 @@ import unittest
 import uuid
 from datetime import datetime, timedelta
 
-from gemini_schemas import GeminiNarrative
+from gemini_schemas import AdvisorHistoryMessage, DatasetAdvisorAnswer, GeminiNarrative
 from schemas import EnergyTimeSeriesInput, EnergyTimeSeriesPoint
 from services.gemini_insight_service import (
     GeminiInsightService,
@@ -154,6 +154,38 @@ class GeminiInsightServiceTests(unittest.TestCase):
 
         self.assertEqual(fake_client.models.call_count, 2)
         self.assertEqual(result.insight.headline, self.make_narrative().headline)
+
+    def test_advisor_is_grounded_in_engine_and_user_context(self):
+        data = self.make_input()
+        analysis = analyze_time_series(data)
+        answer = DatasetAdvisorAnswer(
+            answer="Kỳ cuối cần được đối chiếu nhật ký vận hành.",
+            evidence=["Engine phát hiện một kỳ vượt đường cơ sở."],
+            suggested_actions=["Kiểm tra tải chạy ngoài ca."],
+            verification_metric="kWh/đơn vị sau điều chỉnh",
+            follow_up_questions=["Thiết bị nào hoạt động ngoài ca?"],
+        )
+        fake_client = FakeGeminiClient(answer)
+        service = GeminiInsightService(
+            model="gemini-test",
+            fallback_model=None,
+            client=fake_client,
+        )
+
+        result = service.answer_dataset_question(
+            dataset_id=uuid.uuid4(),
+            data=data,
+            analysis=analysis,
+            question="Tôi nên xử lý gì trước?",
+            history=[AdvisorHistoryMessage(role="user", content="Xưởng chạy hai ca")],
+            operational_context="Máy nén khí chạy trong giờ nghỉ",
+            desired_outcome="Giảm điện mà không giảm sản lượng",
+        )
+
+        prompt = fake_client.models.last_request["contents"]
+        self.assertEqual(result.answer.verification_metric, "kWh/đơn vị sau điều chỉnh")
+        self.assertIn("Máy nén khí chạy trong giờ nghỉ", prompt)
+        self.assertIn("không phải chatbot kiến thức chung", prompt)
 
 
 if __name__ == "__main__":

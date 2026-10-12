@@ -167,7 +167,10 @@ struct AccountAPIService {
             )
         }
         if Response.self == EmptyResponse.self, data.isEmpty {
-            return EmptyResponse() as! Response
+            guard let emptyResponse = EmptyResponse() as? Response else {
+                throw AIRecommendationAPIError.invalidResponse
+            }
+            return emptyResponse
         }
         return try decoder.decode(Response.self, from: data)
     }

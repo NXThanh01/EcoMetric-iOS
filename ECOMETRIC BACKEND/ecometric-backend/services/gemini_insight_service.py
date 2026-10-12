@@ -88,7 +88,6 @@ class GeminiInsightService:
                         model=candidate_model,
                         contents=prompt,
                         config=types.GenerateContentConfig(
-                            temperature=0.2,
                             response_mime_type="application/json",
                             response_schema=GeminiNarrative,
                         ),
@@ -169,7 +168,6 @@ class GeminiInsightService:
                         model=candidate_model,
                         contents=prompt,
                         config=types.GenerateContentConfig(
-                            temperature=0.2,
                             response_mime_type="application/json",
                             response_schema=schema,
                         ),

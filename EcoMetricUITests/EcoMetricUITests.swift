@@ -17,6 +17,7 @@ final class EcoMetricUITests: XCTestCase {
     @MainActor
     func testMoTabAIThanhCong() throws {
         let app = XCUIApplication()
+        app.launchArguments.append("--ui-testing")
         app.launch()
 
         let aiTab = app.tabBars.buttons["AI"]
@@ -26,7 +27,7 @@ final class EcoMetricUITests: XCTestCase {
         )
         aiTab.tap()
 
-        let aiTitle = app.staticTexts["Giải pháp đề xuất"]
+        let aiTitle = app.staticTexts["Trợ lý năng lượng"]
         if !aiTitle.waitForExistence(timeout: 5) {
             aiTab.tap()
         }
@@ -35,35 +36,17 @@ final class EcoMetricUITests: XCTestCase {
             "Màn hình AI không được mở."
         )
 
-        let liveStatus = app.staticTexts[
-            "Đã đồng bộ với EcoMetric Engine"
-        ]
-        let fallbackStatus = app.staticTexts[
-            "Đang sử dụng Calculation Engine trên thiết bị"
-        ]
-
-        let liveLoaded = liveStatus.waitForExistence(timeout: 10)
         XCTAssertTrue(
-            liveLoaded || fallbackStatus.exists,
-            "Màn hình AI không hiển thị trạng thái backend hoặc fallback."
+            app.staticTexts["Chưa có dữ liệu để AI phân tích"]
+                .waitForExistence(timeout: 5),
+            "Màn hình AI không hiển thị trạng thái chưa có dataset."
         )
-
-        if liveLoaded {
-            XCTAssertTrue(
-                app.staticTexts["Giám sát bất thường"]
-                    .waitForExistence(timeout: 5),
-                "Không hiển thị kết quả từ Time-series Engine."
-            )
-            XCTAssertTrue(
-                app.staticTexts["Phát hiện 1 kỳ bất thường"].exists,
-                "Số kỳ bất thường hiển thị không đúng."
-            )
-        }
     }
 
     @MainActor
     func testMoManNhapDuLieuThatThanhCong() throws {
         let app = XCUIApplication()
+        app.launchArguments.append("--ui-testing")
         app.launch()
 
         let dataTab = app.tabBars.buttons

@@ -21,7 +21,11 @@ from auth_schemas import (
     UserResponse,
 )
 from db_models import User
-from gemini_schemas import GeminiDatasetInsightResponse
+from gemini_schemas import (
+    DatasetAdvisorRequest,
+    DatasetAdvisorResponse,
+    GeminiDatasetInsightResponse,
+)
 from persistence_schemas import (
     DatasetDetailResponse,
     DatasetResponse,
@@ -90,7 +94,7 @@ app = FastAPI(
         "Time-series anomaly detection, knowledge retrieval, scoring, "
         "and calculation engine for EcoMetric."
     ),
-    version="1.2.0",
+    version="1.3.0",
 )
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -389,12 +393,49 @@ def generate_saved_dataset_ai_insight(
     db: Session = Depends(get_db),
 ) -> GeminiDatasetInsightResponse:
     try:
+        dataset = get_dataset(db, dataset_id, user.organization_id)
         data = build_time_series_input(db, dataset_id, user.organization_id)
         analysis = analyze_time_series(data)
         return GeminiInsightService().generate_dataset_insight(
             dataset_id=dataset_id,
             data=data,
             analysis=analysis,
+            operational_context=dataset.operational_context,
+            desired_outcome=dataset.desired_outcome,
+        )
+    except ResourceNotFoundError as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
+    except ResourceConflictError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    except GeminiNotConfiguredError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+    except GeminiGenerationError as error:
+        raise HTTPException(status_code=502, detail=str(error)) from error
+
+
+@app.post(
+    "/v1/datasets/{dataset_id}/advisor",
+    response_model=DatasetAdvisorResponse,
+)
+def ask_saved_dataset_advisor(
+    dataset_id: uuid.UUID,
+    request: DatasetAdvisorRequest,
+    user: User = Depends(ready_user),
+    db: Session = Depends(get_db),
+) -> DatasetAdvisorResponse:
+    """Trả lời có kiểm chứng dựa trên dữ liệu của đúng doanh nghiệp hiện tại."""
+    try:
+        dataset = get_dataset(db, dataset_id, user.organization_id)
+        data = build_time_series_input(db, dataset_id, user.organization_id)
+        analysis = analyze_time_series(data)
+        return GeminiInsightService().answer_dataset_question(
+            dataset_id=dataset_id,
+            data=data,
+            analysis=analysis,
+            question=request.question,
+            history=request.history,
+            operational_context=dataset.operational_context,
+            desired_outcome=dataset.desired_outcome,
         )
     except ResourceNotFoundError as error:
         raise HTTPException(status_code=404, detail=str(error)) from error

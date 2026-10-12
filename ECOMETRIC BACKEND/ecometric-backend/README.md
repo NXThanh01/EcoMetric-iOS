@@ -13,7 +13,7 @@ flowchart LR
     DB --> TS[Time-series Engine v1.2]
     TS --> GM[Gemini Insight Service]
     GM --> P[Gemini 3.8 Flash]
-    GM -. Khi quá tải .-> F[Gemini 3.5 Flash]
+    GM -. Khi quá tải .-> F[Gemini 3.6 Flash]
     GM --> IOS
 ```
 
@@ -77,9 +77,9 @@ Khi phát triển local, `ECOMETRIC_EMAIL_DELIVERY_MODE=console` ghi OTP vào lo
 ECOMETRIC_EMAIL_DELIVERY_MODE=smtp
 ECOMETRIC_SMTP_HOST=smtp.gmail.com
 ECOMETRIC_SMTP_PORT=587
-ECOMETRIC_SMTP_USERNAME=email_cua_ban@gmail.com
-ECOMETRIC_SMTP_PASSWORD=mat_khau_ung_dung
-ECOMETRIC_SMTP_FROM_EMAIL=email_cua_ban@gmail.com
+ECOMETRIC_SMTP_USERNAME=
+ECOMETRIC_SMTP_PASSWORD=
+ECOMETRIC_SMTP_FROM_EMAIL=
 ECOMETRIC_SMTP_USE_TLS=true
 ECOMETRIC_SMTP_USE_SSL=false
 ECOMETRIC_OTP_SECRET=chuoi_bi_mat_ngau_nhien
@@ -98,6 +98,7 @@ Trong `http://127.0.0.1:8000/docs`, đăng ký hoặc đăng nhập trước, b�
 3. `GET /v1/datasets/{dataset_id}/measurements` để kiểm tra dữ liệu đã lưu.
 4. `POST /v1/datasets/{dataset_id}/analyze` để engine định lượng đọc dữ liệu từ PostgreSQL và phân tích.
 5. `POST /v1/datasets/{dataset_id}/ai-insight` để nhận kết quả định lượng kèm diễn giải Gemini.
+6. `POST /v1/datasets/{dataset_id}/advisor` để hỏi tiếp trên đúng dataset, bối cảnh vận hành và kết quả Engine.
 
 Request mẫu nằm tại `examples/electricity_dataset.json`. Có thể lưu từ một điểm đo, nhưng cần ít nhất 7 điểm để chạy phân tích AI. Hệ thống từ chối điện năng âm và các mốc thời gian bị trùng trong cùng bộ dữ liệu.
 
@@ -111,7 +112,7 @@ Phần diễn giải và khuyến nghị AI sử dụng Gemini API từ backend.
 ```text
 ECOMETRIC_GEMINI_API_KEY=api_key_cua_ban
 ECOMETRIC_GEMINI_MODEL=gemini-3.8-flash
-ECOMETRIC_GEMINI_FALLBACK_MODEL=gemini-3.5-flash
+ECOMETRIC_GEMINI_FALLBACK_MODEL=gemini-3.6-flash
 ```
 
 3. Khởi động lại backend và kiểm tra `GET /health`. Trường `gemini` phải là `configured`.
@@ -119,7 +120,11 @@ ECOMETRIC_GEMINI_FALLBACK_MODEL=gemini-3.5-flash
 
 Backend luôn tính đường cơ sở, điện vượt mức và tỷ lệ bất thường trước. Gemini chỉ nhận dữ liệu đã kiểm tra để viết insight có cấu trúc, giả thuyết nguyên nhân và kế hoạch hành động. Prompt cấm Gemini tự tạo số liệu tài chính, tỷ lệ tiết kiệm hoặc xem giả thuyết là kết luận chắc chắn.
 
-`gemini-3.8-flash` là model chính. Nếu Google tạm thời trả lỗi quá tải, service sẽ thử lại và tự chuyển sang `gemini-3.5-flash`; trường `model` trong phản hồi luôn cho biết model thực tế đã tạo insight.
+`gemini-3.8-flash` là model chính. Nếu Google tạm thời trả lỗi quá tải, service sẽ thử lại và tự chuyển sang `gemini-3.6-flash`; trường `model` trong phản hồi luôn cho biết model thực tế đã tạo insight.
+
+### Cố vấn EcoMetric có kiểm chứng
+
+Endpoint `POST /v1/datasets/{dataset_id}/advisor` là lớp hội thoại dành riêng cho báo cáo. Nó không trả lời như chatbot kiến thức chung: backend đưa vào đúng số đo của doanh nghiệp, phân tích định lượng, bối cảnh người dùng khai báo và tối đa 8 tin nhắn gần nhất. Schema phản hồi buộc AI tách nội dung trả lời, bằng chứng, hành động, KPI đo lại và câu hỏi bổ sung. Nếu dataset không đủ căn cứ, AI phải nói rõ giới hạn thay vì tự tạo con số.
 
 ## Kiểm thử nhanh qua HTTP
 
@@ -170,6 +175,7 @@ Sau đó đặt `ECOMETRIC_API_BASE_URL` trong Scheme thành `http://<IP-của-M
 - `GET /v1/datasets/{id}/measurements`: đọc các điểm đo theo thời gian.
 - `POST /v1/datasets/{id}/analyze`: chạy phân tích định lượng trên dữ liệu đã lưu trong PostgreSQL.
 - `POST /v1/datasets/{id}/ai-insight`: dùng Gemini tạo insight và khuyến nghị có cấu trúc.
+- `POST /v1/datasets/{id}/advisor`: hỏi đáp có kiểm chứng theo đúng dataset và kết quả Engine.
 - `POST /analyze`: phát hiện cơ hội từ dữ liệu vận hành.
 - `POST /analyze/time-series`: phát hiện đột biến và xu hướng tăng từ chuỗi dữ liệu điện.
 - `POST /recommendations`: tạo và xếp hạng tất cả giải pháp phù hợp.
@@ -228,6 +234,6 @@ Các nguyên nhân được trình bày dưới dạng giả thuyết, không ph
 python -m unittest discover -s tests -v
 ```
 
-Phiên bản hiện tại có 33 kiểm thử backend, bao gồm nội dung email OTP và thư mời, mật khẩu tạm, khóa API trước khi đổi mật khẩu, phân quyền, cô lập dữ liệu doanh nghiệp, persistence, phân tích chuỗi thời gian, recommendation engine và structured Gemini response.
+Phiên bản hiện tại có 34 kiểm thử backend, bao gồm nội dung email OTP và thư mời, mật khẩu tạm, khóa API trước khi đổi mật khẩu, phân quyền, cô lập dữ liệu doanh nghiệp, persistence, bối cảnh vận hành, phân tích chuỗi thời gian, recommendation engine, structured Gemini response và cố vấn theo dataset.
 
 Hiện Time-series Engine v1.2 hỗ trợ phát hiện bất thường, chẩn đoán có giải thích và đề xuất hành động kiểm chứng. Recommendation Engine hỗ trợ thay đèn công suất cao bằng LED và tối ưu lịch vận hành chiếu sáng. Knowledge base lò hơi mới chỉ có nội dung tham chiếu, chưa có calculation engine tương ứng.

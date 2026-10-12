@@ -84,6 +84,23 @@ struct OperationalDataAPIService {
         )
     }
 
+    func askAdvisor(
+        datasetID: UUID,
+        question: String,
+        history: [AdvisorHistoryMessage]
+    ) async throws -> DatasetAdvisorResponse {
+        try await send(
+            path: "v1/datasets/\(datasetID.uuidString)/advisor",
+            method: "POST",
+            payload: DatasetAdvisorRequest(
+                question: question,
+                history: Array(history.suffix(8))
+            ),
+            timeoutInterval: 120,
+            responseType: DatasetAdvisorResponse.self
+        )
+    }
+
     private func makeURL(path: String) -> URL {
         path.split(separator: "/").reduce(baseURL) { url, component in
             url.appendingPathComponent(String(component))
@@ -109,13 +126,14 @@ struct OperationalDataAPIService {
         path: String,
         method: String,
         payload: Payload,
+        timeoutInterval: TimeInterval = 25,
         responseType: Response.Type
     ) async throws -> Response {
         try await send(
             path: path,
             method: method,
             body: try encoder.encode(payload),
-            timeoutInterval: 25,
+            timeoutInterval: timeoutInterval,
             responseType: responseType
         )
     }

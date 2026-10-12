@@ -26,6 +26,8 @@ struct ElectricityDatasetRequest: Encodable {
     let meterName: String
     let sourceType: String
     let interval: String
+    let operationalContext: String?
+    let desiredOutcome: String?
     let points: [EnergyTimeSeriesPoint]
 
     enum CodingKeys: String, CodingKey {
@@ -33,6 +35,8 @@ struct ElectricityDatasetRequest: Encodable {
         case meterName = "meter_name"
         case sourceType = "source_type"
         case interval
+        case operationalContext = "operational_context"
+        case desiredOutcome = "desired_outcome"
         case points
     }
 }
@@ -44,10 +48,40 @@ struct StoredDatasetResponse: Codable, Identifiable {
     let sourceType: String
     let interval: String
     let status: String
+    let operationalContext: String?
+    let desiredOutcome: String?
     let recordCount: Int
     let periodStart: String?
     let periodEnd: String?
     let createdAt: String
+
+    init(
+        id: UUID,
+        facilityID: UUID,
+        meterID: UUID?,
+        sourceType: String,
+        interval: String,
+        status: String,
+        operationalContext: String? = nil,
+        desiredOutcome: String? = nil,
+        recordCount: Int,
+        periodStart: String?,
+        periodEnd: String?,
+        createdAt: String
+    ) {
+        self.id = id
+        self.facilityID = facilityID
+        self.meterID = meterID
+        self.sourceType = sourceType
+        self.interval = interval
+        self.status = status
+        self.operationalContext = operationalContext
+        self.desiredOutcome = desiredOutcome
+        self.recordCount = recordCount
+        self.periodStart = periodStart
+        self.periodEnd = periodEnd
+        self.createdAt = createdAt
+    }
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -56,10 +90,62 @@ struct StoredDatasetResponse: Codable, Identifiable {
         case sourceType = "source_type"
         case interval
         case status
+        case operationalContext = "operational_context"
+        case desiredOutcome = "desired_outcome"
         case recordCount = "record_count"
         case periodStart = "period_start"
         case periodEnd = "period_end"
         case createdAt = "created_at"
+    }
+}
+
+struct DatasetAdvisorRequest: Encodable {
+    let question: String
+    let history: [AdvisorHistoryMessage]
+}
+
+struct AdvisorHistoryMessage: Encodable {
+    let role: String
+    let content: String
+
+    init(role: String, content: String) {
+        self.role = role
+        self.content = content
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case role
+        case content
+    }
+}
+
+struct DatasetAdvisorResponse: Decodable {
+    let provider: String
+    let model: String
+    let datasetID: UUID
+    let answer: DatasetAdvisorAnswer
+
+    enum CodingKeys: String, CodingKey {
+        case provider
+        case model
+        case datasetID = "dataset_id"
+        case answer
+    }
+}
+
+struct DatasetAdvisorAnswer: Decodable {
+    let answer: String
+    let evidence: [String]
+    let suggestedActions: [String]
+    let verificationMetric: String?
+    let followUpQuestions: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case answer
+        case evidence
+        case suggestedActions = "suggested_actions"
+        case verificationMetric = "verification_metric"
+        case followUpQuestions = "follow_up_questions"
     }
 }
 

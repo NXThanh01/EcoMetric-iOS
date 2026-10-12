@@ -46,8 +46,10 @@ flowchart LR
     B --> C[(PostgreSQL)]
     C --> D[Phân tích định lượng]
     D --> E[Gemini AI Insight]
-    E --> F[Khuyến nghị hành động]
-    F --> G[Đo lại hiệu quả]
+    E --> F[Cố vấn EcoMetric có kiểm chứng]
+    F --> I[Chat theo đúng dataset]
+    I --> J[Bằng chứng + hành động + KPI]
+    J --> G[Đo lại hiệu quả]
     G --> H[Báo cáo năng lượng PDF]
     G -. Cải tiến liên tục .-> A
 
@@ -80,6 +82,7 @@ flowchart TD
 | Data Input | Nhập số liệu điện, sản lượng, giờ vận hành và lưu PostgreSQL | 🟢 Hoạt động |
 | Time-series Engine | Đường cơ sở, chuẩn hóa, anomaly detection và chẩn đoán định lượng | 🟢 Engine v1.2 |
 | Gemini AI Insight | Diễn giải dữ liệu thật, giả thuyết nguyên nhân và hành động kiểm chứng | 🟢 Hoạt động |
+| Cố vấn EcoMetric | Chat ngay trong báo cáo, câu trả lời neo vào dataset, Engine và bối cảnh vận hành | 🟢 Hoạt động |
 | Recommendation Engine | Kịch bản, xếp hạng và giải thích giải pháp tiết kiệm | 🟢 Engine v1.0 |
 | Solution Detail | Chỉ số tiết kiệm, hoàn vốn, nguồn và metadata | 🟢 Hoạt động |
 | Action Plan | Các bước triển khai, người phụ trách, deadline, KPI | 🟢 MVP |
@@ -137,6 +140,11 @@ flowchart TB
 
 - **Engine tính toán**: baseline, điện năng, mức vượt chuẩn, tỷ lệ bất thường và độ tin cậy. Đây là các số liệu xác định, có thể kiểm tra lại.
 - **AI đề xuất**: tóm tắt cho quản lý, giả thuyết nguyên nhân, giải pháp ưu tiên và câu hỏi cần xác minh. Mọi nội dung do Gemini sinh đều có nhãn `AI đề xuất` trên iOS.
+- **AI có kiểm chứng**: chatbot trong báo cáo chỉ nhận dữ liệu của đúng doanh nghiệp, kết quả Engine và phần mô tả do người dùng cung cấp; phản hồi tách riêng bằng chứng, hành động và KPI cần đo lại.
+
+### Vì sao dùng EcoMetric thay vì hỏi chatbot chung?
+
+EcoMetric tạo một **vòng lặp cải tiến có thể kiểm tra**: lưu số đo gốc, tính bằng Engine xác định, dùng AI để diễn giải, ghi rõ phần nào là giả thuyết, đề xuất KPI rồi đo lại kết quả. Chatbot chung không có sẵn dữ liệu doanh nghiệp đã cô lập, lịch sử phép đo, quy tắc tính toán và báo cáo PDF cùng nguồn gốc như luồng này.
 
 ### Mô hình phân quyền doanh nghiệp
 
@@ -174,6 +182,10 @@ sequenceDiagram
     Gemini-->>API: Insight tiếng Việt có cấu trúc
     API-->>App: Số liệu + nguyên nhân + khuyến nghị
     App-->>User: AI Insight và bước kiểm chứng
+    User->>App: Hỏi tiếp ngay trong báo cáo
+    App->>API: POST /v1/datasets/{id}/advisor
+    API->>Gemini: Dataset + Engine + bối cảnh + lịch sử chat
+    Gemini-->>App: Bằng chứng + hành động + KPI đo lại
 ```
 
 ## 🧮 Use case đang hoạt động
@@ -279,13 +291,13 @@ ECOMETRIC_DB_USER=ecometric_app
 ECOMETRIC_DB_PASSWORD=mat_khau_postgresql
 ECOMETRIC_GEMINI_API_KEY=api_key_tu_google_ai_studio
 ECOMETRIC_GEMINI_MODEL=gemini-3.8-flash
-ECOMETRIC_GEMINI_FALLBACK_MODEL=gemini-3.5-flash
+ECOMETRIC_GEMINI_FALLBACK_MODEL=gemini-3.6-flash
 ECOMETRIC_EMAIL_DELIVERY_MODE=smtp
 ECOMETRIC_SMTP_HOST=smtp.gmail.com
 ECOMETRIC_SMTP_PORT=587
-ECOMETRIC_SMTP_USERNAME=email_cua_ban@gmail.com
-ECOMETRIC_SMTP_PASSWORD=mat_khau_ung_dung
-ECOMETRIC_SMTP_FROM_EMAIL=email_cua_ban@gmail.com
+ECOMETRIC_SMTP_USERNAME=
+ECOMETRIC_SMTP_PASSWORD=
+ECOMETRIC_SMTP_FROM_EMAIL=
 ECOMETRIC_SMTP_USE_TLS=true
 ECOMETRIC_OTP_SECRET=chuoi_bi_mat_ngau_nhien
 ```
@@ -310,6 +322,7 @@ Backend mặc định chạy tại `http://127.0.0.1:8000`:
 - Lưu dữ liệu điện thật: `POST /v1/datasets/electricity`
 - Phân tích định lượng: `POST /v1/datasets/{id}/analyze`
 - Gemini AI Insight: `POST /v1/datasets/{id}/ai-insight`
+- Cố vấn theo báo cáo: `POST /v1/datasets/{id}/advisor`
 - Knowledge sample: `GET /knowledge/led`
 - Opportunity detection: `POST /analyze`
 - Time-series anomaly detection: `POST /analyze/time-series`
@@ -374,6 +387,19 @@ Endpoint đọc dữ liệu đã lưu trong PostgreSQL, chạy Time-series Engin
 Các con số định lượng do backend tính toán. Gemini không được phép tự tạo chi phí, tỷ lệ tiết kiệm hoặc biến giả thuyết thành kết luận chắc chắn.
 
 </details>
+
+<details>
+<summary><strong>POST /v1/datasets/{id}/advisor</strong></summary>
+
+Chatbot trong tab Báo cáo dùng đúng dataset đã lưu, kết quả Engine, bối cảnh vận hành và mục tiêu người dùng. Mỗi phản hồi có nội dung trả lời, bằng chứng, hành động đề xuất, KPI đo lại và câu hỏi bổ sung; endpoint vẫn áp dụng xác thực và cô lập doanh nghiệp.
+
+</details>
+
+## 🔐 Quản lý bí mật
+
+- Chỉ đặt mật khẩu PostgreSQL, Gemini API key, SMTP App Password và OTP secret trong `.env` local.
+- `.env` đã được Git bỏ qua; `.env.example` chỉ chứa giá trị rỗng hoặc chuỗi minh họa.
+- Nếu GitHub/GitGuardian báo lộ bí mật, hãy **thu hồi credential tại nhà cung cấp trước**, tạo credential mới, cập nhật `.env`, sau đó mới xử lý lịch sử Git. Xóa một dòng ở commit mới không làm bí mật biến mất khỏi các commit cũ.
 
 <details>
 <summary><strong>POST /recommend</strong></summary>

@@ -40,6 +40,8 @@ final class DataInputViewModel: ObservableObject {
     @Published var uploadState: UploadState = .idle
     @Published var facilityName = ""
     @Published var meterName = "Đồng hồ điện tổng"
+    @Published var operationalContext = ""
+    @Published var desiredOutcome = ""
     @Published var measurements: [EnergyMeasurementDraft]
     @Published var result: SavedEnergyAnalysis?
     @Published var errorMessage: String?
@@ -121,6 +123,8 @@ final class DataInputViewModel: ObservableObject {
                         : normalizedMeterName,
                     sourceType: "manual",
                     interval: "daily",
+                    operationalContext: normalizedOptional(operationalContext),
+                    desiredOutcome: normalizedOptional(desiredOutcome),
                     points: points
                 )
             )
@@ -149,6 +153,8 @@ final class DataInputViewModel: ObservableObject {
 
     func resetForm() {
         measurements = Self.makeInitialMeasurements()
+        operationalContext = ""
+        desiredOutcome = ""
         result = nil
         errorMessage = nil
         savedDatasetAwaitingAI = nil
@@ -209,6 +215,11 @@ final class DataInputViewModel: ObservableObject {
             throw error
         }
         return value
+    }
+
+    private func normalizedOptional(_ value: String) -> String? {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
     }
 
     private func generateInsight(

@@ -9,6 +9,7 @@ struct ReportsView: View {
     @State private var exportedReport: ExportedReport?
     @State private var exportError: String?
     @State private var isExporting = false
+    @StateObject private var advisor = ReportAdvisorViewModel()
 
     private let pdfService = EnergyReportPDFService()
 
@@ -25,6 +26,7 @@ struct ReportsView: View {
                         anomalySection(result)
                         aiSummary(result)
                         recommendationSection(result)
+                        advisorSection(result)
                         exportSection(result)
                     } else {
                         emptyState
@@ -37,6 +39,11 @@ struct ReportsView: View {
             .background(EcoTheme.background.ignoresSafeArea())
             .navigationTitle("Báo cáo")
             .navigationBarTitleDisplayMode(.inline)
+            .onChange(of: analysisStore.latestAnalysis?.dataset.id) { _, datasetID in
+                if let datasetID {
+                    advisor.prepare(datasetID: datasetID)
+                }
+            }
             .sheet(item: $exportedReport) { report in
                 ActivityView(items: [report.url])
             }
@@ -378,6 +385,134 @@ struct ReportsView: View {
         .reportCard()
     }
 
+    private func advisorSection(_ result: SavedEnergyAnalysis) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            sectionHeader(
+                "Cố vấn ngay trên báo cáo",
+                subtitle: "Hỏi tiếp dựa trên đúng số đo, Engine và bối cảnh của bộ dữ liệu này",
+                source: .verifiedAdvisor
+            )
+
+            Text("KHÁC BIỆT CỦA ECOMETRIC")
+                .font(.caption2.bold())
+                .foregroundStyle(EcoTheme.darkGreen)
+            Text(
+                "Câu trả lời được neo vào dữ liệu doanh nghiệp và luôn tách bằng chứng, hành động, KPI đo lại."
+            )
+            .font(.caption)
+            .foregroundStyle(EcoTheme.textSecondary)
+
+            if advisor.messages.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        advisorPrompt("Vì sao kỳ này bất thường?", result: result)
+                        advisorPrompt("Tôi nên làm gì trước?", result: result)
+                        advisorPrompt("Đo lại hiệu quả thế nào?", result: result)
+                    }
+                }
+            }
+
+            ForEach(advisor.messages) { message in
+                advisorMessage(message)
+            }
+
+            if let error = advisor.errorMessage {
+                Label(error, systemImage: "exclamationmark.circle.fill")
+                    .font(.caption)
+                    .foregroundStyle(.red)
+            }
+
+            HStack(alignment: .bottom, spacing: 9) {
+                TextField(
+                    "Hỏi về báo cáo này...",
+                    text: $advisor.question,
+                    axis: .vertical
+                )
+                .lineLimit(1...4)
+                .padding(11)
+                .foregroundStyle(EcoTheme.textPrimary)
+                .background(EcoTheme.background)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                Button {
+                    Task { await advisor.ask(datasetID: result.dataset.id) }
+                } label: {
+                    Group {
+                        if advisor.isSending {
+                            ProgressView().tint(.white)
+                        } else {
+                            Image(systemName: "arrow.up")
+                                .font(.headline.bold())
+                        }
+                    }
+                    .frame(width: 42, height: 42)
+                    .foregroundStyle(.white)
+                    .background(EcoTheme.green)
+                    .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .disabled(advisor.isSending || advisor.question.trimmingCharacters(in: .whitespacesAndNewlines).count < 2)
+            }
+        }
+        .reportCard(accent: EcoTheme.green)
+        .task {
+            advisor.prepare(datasetID: result.dataset.id)
+        }
+    }
+
+    private func advisorPrompt(_ title: String, result: SavedEnergyAnalysis) -> some View {
+        Button(title) {
+            Task { await advisor.ask(title, datasetID: result.dataset.id) }
+        }
+        .font(.caption.bold())
+        .buttonStyle(.plain)
+        .foregroundStyle(EcoTheme.blue)
+        .padding(.horizontal, 11)
+        .padding(.vertical, 9)
+        .background(EcoTheme.lightBlue)
+        .clipShape(Capsule())
+        .disabled(advisor.isSending)
+    }
+
+    private func advisorMessage(_ message: AdvisorChatEntry) -> some View {
+        VStack(alignment: .leading, spacing: 9) {
+            Text(message.sender == .user ? "BẠN" : "CỐ VẤN ECOMETRIC")
+                .font(.caption2.bold())
+                .foregroundStyle(message.sender == .user ? EcoTheme.blue : EcoTheme.green)
+            Text(message.text)
+                .font(.subheadline)
+                .foregroundStyle(EcoTheme.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if !message.evidence.isEmpty {
+                advisorList("Bằng chứng", items: message.evidence, icon: "checkmark.seal.fill")
+            }
+            if !message.actions.isEmpty {
+                advisorList("Hành động", items: message.actions, icon: "checklist")
+            }
+            if let metric = message.verificationMetric, !metric.isEmpty {
+                infoRow(icon: "scope", title: "KPI đo lại", value: metric)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(message.sender == .user ? EcoTheme.lightBlue : EcoTheme.lightGreen.opacity(0.65))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+
+    private func advisorList(_ title: String, items: [String], icon: String) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Label(title.uppercased(), systemImage: icon)
+                .font(.caption2.bold())
+                .foregroundStyle(EcoTheme.darkGreen)
+            ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+                Text("\(index + 1). \(item)")
+                    .font(.caption)
+                    .foregroundStyle(EcoTheme.textSecondary)
+            }
+        }
+    }
+
     private var emptyState: some View {
         VStack(spacing: 16) {
             Image(systemName: "doc.text.magnifyingglass")
@@ -519,10 +654,30 @@ struct ReportsView: View {
 private enum ReportSource {
     case engine
     case ai
+    case verifiedAdvisor
 
-    var label: String { self == .engine ? "ENGINE CALCULATOR" : "AI ĐỀ XUẤT" }
-    var icon: String { self == .engine ? "function" : "sparkles" }
-    var color: Color { self == .engine ? EcoTheme.blue : EcoTheme.green }
+    var label: String {
+        switch self {
+        case .engine: return "ENGINE CALCULATOR"
+        case .ai: return "AI ĐỀ XUẤT"
+        case .verifiedAdvisor: return "AI CÓ KIỂM CHỨNG"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .engine: return "function"
+        case .ai: return "sparkles"
+        case .verifiedAdvisor: return "bubble.left.and.text.bubble.right.fill"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .engine: return EcoTheme.blue
+        case .ai, .verifiedAdvisor: return EcoTheme.green
+        }
+    }
 }
 
 private struct EnergySlice: Identifiable {

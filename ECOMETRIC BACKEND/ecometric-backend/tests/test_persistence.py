@@ -102,6 +102,8 @@ class PersistenceTests(unittest.TestCase):
                     meter_name="Đồng hồ tổng",
                     source_type="manual",
                     interval="daily",
+                    operational_context="Máy nén khí chạy trong giờ nghỉ",
+                    desired_outcome="Giảm điện nhưng giữ nguyên sản lượng",
                     points=self._make_points(),
                 ),
                 organization.id,
@@ -120,6 +122,14 @@ class PersistenceTests(unittest.TestCase):
             result = analyze_time_series(analysis_input)
 
             self.assertEqual(dataset.record_count, 7)
+            self.assertEqual(
+                dataset.operational_context,
+                "Máy nén khí chạy trong giờ nghỉ",
+            )
+            self.assertEqual(
+                dataset.desired_outcome,
+                "Giảm điện nhưng giữ nguyên sản lượng",
+            )
             self.assertEqual(len(measurements), 7)
             self.assertEqual(len(result.anomalies), 1)
 

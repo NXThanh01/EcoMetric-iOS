@@ -20,6 +20,7 @@ struct DataInputView: View {
                     header
                     dataSourceCard
                     facilityCard
+                    operationalContextCard
                     measurementsSection
 
                     if let errorMessage = viewModel.errorMessage {
@@ -156,8 +157,33 @@ struct DataInputView: View {
         .inputCard()
     }
 
+    private var operationalContextCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            sectionTitle(
+                "Bối cảnh để AI tư vấn đúng hơn",
+                subtitle: "Thông tin bạn mô tả được đánh dấu là bối cảnh tham khảo, không thay thế số đo của Engine."
+            )
+
+            multilineField(
+                title: "Tình trạng đang gặp phải",
+                placeholder: "Ví dụ: Máy nén khí chạy cả giờ nghỉ, khu vực A nóng bất thường...",
+                text: $viewModel.operationalContext,
+                accessibilityID: "operationalContextField"
+            )
+
+            multilineField(
+                title: "Mục tiêu mong muốn",
+                placeholder: "Ví dụ: Giảm 10% điện năng nhưng không ảnh hưởng sản lượng...",
+                text: $viewModel.desiredOutcome,
+                accessibilityID: "desiredOutcomeField"
+            )
+        }
+        .inputCard()
+    }
+
     private func measurementRow(index: Int) -> some View {
         let binding = $viewModel.measurements[index]
+        let measurementID = viewModel.measurements[index].id
 
         return VStack(spacing: 12) {
             HStack {
@@ -178,7 +204,7 @@ struct DataInputView: View {
                 Button(role: .destructive) {
                     withAnimation(.easeInOut(duration: 0.2)) {
                         viewModel.removeMeasurement(
-                            id: viewModel.measurements[index].id
+                            id: measurementID
                         )
                     }
                 } label: {
@@ -603,6 +629,26 @@ struct DataInputView: View {
                 .accessibilityIdentifier(accessibilityID)
         }
         .frame(maxWidth: .infinity)
+    }
+
+    private func multilineField(
+        title: String,
+        placeholder: String,
+        text: Binding<String>,
+        accessibilityID: String
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.caption.bold())
+                .foregroundStyle(EcoTheme.textSecondary)
+            TextField(placeholder, text: text, axis: .vertical)
+                .lineLimit(3...6)
+                .padding(12)
+                .foregroundStyle(EcoTheme.textPrimary)
+                .background(EcoTheme.background)
+                .clipShape(RoundedRectangle(cornerRadius: 11))
+                .accessibilityIdentifier(accessibilityID)
+        }
     }
 }
 

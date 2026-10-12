@@ -13,11 +13,20 @@ struct AppRootView: View {
     @StateObject private var analysisStore = AppAnalysisStore()
     @StateObject private var accountSession = AccountSession()
 
+    private var isRunningUITests: Bool {
+        ProcessInfo.processInfo.arguments.contains("--ui-testing")
+    }
+
     var body: some View {
 
         ZStack {
 
-            if showSplash {
+            if isRunningUITests {
+
+                RootTabView()
+                    .transition(.opacity)
+
+            } else if showSplash {
 
                 SplashView()
                     .transition(.opacity)
@@ -39,6 +48,8 @@ struct AppRootView: View {
         .environmentObject(analysisStore)
         .environmentObject(accountSession)
         .task {
+
+            guard !isRunningUITests else { return }
 
             await accountSession.restore()
 
