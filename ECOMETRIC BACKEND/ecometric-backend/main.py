@@ -100,7 +100,7 @@ app = FastAPI(
         "Time-series anomaly detection, knowledge retrieval, scoring, "
         "and calculation engine for EcoMetric."
     ),
-    version="1.4.0",
+    version="1.4.1",
     docs_url=None if is_production else "/docs",
     redoc_url=None if is_production else "/redoc",
     openapi_url=None if is_production else "/openapi.json",
@@ -458,7 +458,7 @@ def generate_saved_dataset_ai_insight(
     except GeminiNotConfiguredError as error:
         raise HTTPException(status_code=503, detail=str(error)) from error
     except GeminiGenerationError as error:
-        raise HTTPException(status_code=502, detail=str(error)) from error
+        raise HTTPException(status_code=error.status_code, detail=str(error)) from error
 
 
 @app.post(
@@ -492,7 +492,7 @@ def ask_saved_dataset_advisor(
     except GeminiNotConfiguredError as error:
         raise HTTPException(status_code=503, detail=str(error)) from error
     except GeminiGenerationError as error:
-        raise HTTPException(status_code=502, detail=str(error)) from error
+        raise HTTPException(status_code=error.status_code, detail=str(error)) from error
 
 
 @app.get("/v1/datasets", response_model=list[DatasetDetailResponse])

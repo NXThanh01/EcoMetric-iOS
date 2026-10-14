@@ -7,6 +7,7 @@ from schemas import EnergyTimeSeriesInput, EnergyTimeSeriesPoint
 from services.gemini_insight_service import (
     GeminiInsightService,
     GeminiNotConfiguredError,
+    GeminiGenerationError,
 )
 from services.time_series_service import analyze_time_series
 
@@ -50,6 +51,56 @@ class FlakyGeminiClient:
 
 
 class GeminiInsightServiceTests(unittest.TestCase):
+    def test_overload_switches_model_without_repeating_failed_model(self):
+        from types import SimpleNamespace
+        calls = []
+        narrative = self.make_narrative()
+        def generate(**kwargs):
+            calls.append(kwargs["model"])
+            if kwargs["model"] == "primary":
+                error = RuntimeError("quá tải")
+                error.code = 503
+                raise error
+            return FakeGeminiResponse(parsed=narrative)
+        service = GeminiInsightService(model="primary", fallback_model="fallback",
+            client=SimpleNamespace(models=SimpleNamespace(generate_content=generate)))
+        data = self.make_input()
+        result = service.generate_dataset_insight(uuid.uuid4(), data, analyze_time_series(data))
+        self.assertEqual(calls, ["primary", "fallback"])
+        self.assertEqual(result.model, "fallback")
+
+    def test_invalid_key_fails_fast_with_safe_message(self):
+        from types import SimpleNamespace
+        calls = []
+        def generate(**kwargs):
+            calls.append(kwargs["model"])
+            error = RuntimeError("khóa bí mật không được ghi ra")
+            error.code = 403
+            raise error
+        service = GeminiInsightService(model="primary", fallback_model="fallback",
+            client=SimpleNamespace(models=SimpleNamespace(generate_content=generate)))
+        data = self.make_input()
+        with self.assertRaises(GeminiGenerationError) as caught:
+            service.generate_dataset_insight(uuid.uuid4(), data, analyze_time_series(data))
+        self.assertEqual(calls, ["primary"])
+        self.assertEqual(caught.exception.status_code, 503)
+        self.assertNotIn("bí mật", str(caught.exception))
+
+    def test_quota_is_not_retried_repeatedly(self):
+        from types import SimpleNamespace
+        calls = []
+        def generate(**kwargs):
+            calls.append(kwargs["model"])
+            error = RuntimeError("quota")
+            error.code = 429
+            raise error
+        service = GeminiInsightService(model="primary", fallback_model="fallback",
+            client=SimpleNamespace(models=SimpleNamespace(generate_content=generate)))
+        data = self.make_input()
+        with self.assertRaises(GeminiGenerationError) as caught:
+            service.generate_dataset_insight(uuid.uuid4(), data, analyze_time_series(data))
+        self.assertEqual(calls, ["primary", "fallback"])
+        self.assertIn("quota", str(caught.exception))
     def make_input(self):
         start = datetime(2026, 10, 1)
         values = [100, 101, 99, 100, 102, 98, 160]

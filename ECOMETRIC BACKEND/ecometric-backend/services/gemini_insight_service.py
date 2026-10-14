@@ -1,11 +1,14 @@
 import json
 import logging
 import uuid
+import time
+import random
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from google import genai
 from google.genai import types
+import httpx
 
 from gemini_schemas import (
     AdvisorHistoryMessage,
@@ -26,11 +29,15 @@ class GeminiNotConfiguredError(Exception):
 
 
 class GeminiGenerationError(Exception):
-    pass
+    def __init__(self, message, status_code=502):
+        super().__init__(message)
+        self.status_code = status_code
 
 
 class GeminiInsightService:
     MAX_ATTEMPTS = 2
+    REQUEST_TIMEOUT_MS = 20000
+    TOTAL_BUDGET_SECONDS = 90
 
     def __init__(
         self,
@@ -66,7 +73,7 @@ class GeminiInsightService:
                 "Dịch vụ AI chưa được cấu hình trên backend"
             )
 
-        client = self.client or genai.Client(api_key=self.api_key)
+        client = self.client or self._make_client()
         prompt = self._build_prompt(
             data,
             analysis,
@@ -74,42 +81,11 @@ class GeminiInsightService:
             desired_outcome,
         )
 
-        last_error: Optional[Exception] = None
-        narrative: Optional[GeminiNarrative] = None
-        selected_model = self.model
-        models = [self.model]
-        if self.fallback_model and self.fallback_model != self.model:
-            models.append(self.fallback_model)
-
-        for candidate_model in models:
-            for _ in range(self.MAX_ATTEMPTS):
-                try:
-                    response = client.models.generate_content(
-                        model=candidate_model,
-                        contents=prompt,
-                        config=types.GenerateContentConfig(
-                            response_mime_type="application/json",
-                            response_schema=GeminiNarrative,
-                        ),
-                    )
-                    narrative = self._parse_narrative(response)
-                    selected_model = candidate_model
-                    break
-                except Exception as error:
-                    last_error = error
-                    logger.warning(
-                        "Gemini Insight attempt with %s failed (%s): %s",
-                        candidate_model,
-                        type(error).__name__,
-                        error,
-                    )
-            if narrative is not None:
-                break
-
-        if narrative is None:
-            raise GeminiGenerationError(
-                "AI đang bận hoặc chưa phản hồi. Số đo đã lưu; hãy thử phân tích lại sau."
-            ) from last_error
+        try:
+            narrative, selected_model = self._generate_structured(client, prompt, GeminiNarrative)
+        finally:
+            if self.client is None:
+                client.close()
 
         return GeminiDatasetInsightResponse(
             model=selected_model,
@@ -135,7 +111,7 @@ class GeminiInsightService:
                 "Dịch vụ AI chưa được cấu hình trên backend"
             )
 
-        client = self.client or genai.Client(api_key=self.api_key)
+        client = self.client or self._make_client()
         prompt = self._build_advisor_prompt(
             data=data,
             analysis=analysis,
@@ -144,11 +120,11 @@ class GeminiInsightService:
             operational_context=operational_context,
             desired_outcome=desired_outcome,
         )
-        answer, selected_model = self._generate_structured(
-            client=client,
-            prompt=prompt,
-            schema=DatasetAdvisorAnswer,
-        )
+        try:
+            answer, selected_model = self._generate_structured(client, prompt, DatasetAdvisorAnswer)
+        finally:
+            if self.client is None:
+                client.close()
         return DatasetAdvisorResponse(
             model=selected_model,
             dataset_id=dataset_id,
@@ -157,12 +133,15 @@ class GeminiInsightService:
 
     def _generate_structured(self, client, prompt: str, schema):
         last_error: Optional[Exception] = None
+        deadline = time.monotonic() + self.TOTAL_BUDGET_SECONDS
         models = [self.model]
         if self.fallback_model and self.fallback_model != self.model:
             models.append(self.fallback_model)
 
         for candidate_model in models:
-            for _ in range(self.MAX_ATTEMPTS):
+            for attempt in range(self.MAX_ATTEMPTS):
+                if time.monotonic() + self.REQUEST_TIMEOUT_MS / 1000 > deadline:
+                    break
                 try:
                     response = client.models.generate_content(
                         model=candidate_model,
@@ -185,16 +164,40 @@ class GeminiInsightService:
                     return schema.model_validate_json(text), candidate_model
                 except Exception as error:
                     last_error = error
+                    code = getattr(error, "code", None)
                     logger.warning(
-                        "Gemini Advisor attempt with %s failed (%s): %s",
+                        "AI request with %s failed (%s, status=%s)",
                         candidate_model,
                         type(error).__name__,
-                        error,
+                        code,
                     )
+                    if code in {401, 403}:
+                        raise GeminiGenerationError("Dịch vụ AI chưa được cấp quyền hợp lệ. Quản trị viên cần kiểm tra API key và quyền truy cập.", 503) from error
+                    # Không gọi lặp model không còn hỗ trợ; chuyển dự phòng khi quá tải hoặc hết quota.
+                    if code in {400, 404, 429, 503}:
+                        break
+                    if attempt + 1 < self.MAX_ATTEMPTS:
+                        time.sleep(2 ** attempt + random.uniform(0, 0.25))
 
-        raise GeminiGenerationError(
-            "Không thể tạo câu trả lời từ Cố vấn EcoMetric"
-        ) from last_error
+        code = getattr(last_error, "code", None)
+        if code == 429:
+            message = "Dịch vụ AI đã chạm giới hạn lượt gọi hoặc quota. Hãy thử lại sau; quản trị viên cần kiểm tra hạn mức."
+        elif code == 503:
+            message = "Dịch vụ AI đang quá tải ở cả model chính và dự phòng. Số đo đã lưu, hãy thử lại sau ít phút."
+        elif code == 404:
+            message = "Model AI không khả dụng với tài khoản này. Quản trị viên cần kiểm tra cấu hình model."
+        elif isinstance(last_error, httpx.TimeoutException):
+            message = "AI phản hồi quá thời gian chờ. Số đo đã lưu; hãy thử phân tích lại."
+        else:
+            message = "AI chưa trả về nội dung phân tích hợp lệ. Số đo đã lưu; hãy thử lại."
+        raise GeminiGenerationError(message, 503 if code in {429, 503, 404} else 502) from last_error
+
+    def _make_client(self):
+        # Một tầng retry duy nhất để không nhân số lần gọi và vượt timeout trên iOS.
+        return genai.Client(api_key=self.api_key, http_options=types.HttpOptions(
+            timeout=self.REQUEST_TIMEOUT_MS,
+            retry_options=types.HttpRetryOptions(attempts=1),
+        ))
 
     @staticmethod
     def _parse_narrative(response: Any) -> GeminiNarrative:

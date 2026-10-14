@@ -23,8 +23,8 @@ class Settings(BaseSettings):
     db_user: str = "ecometric_app"
     db_password: str
     gemini_api_key: Optional[str] = None
-    gemini_model: str = "gemini-3.8-flash"
-    gemini_fallback_model: Optional[str] = "gemini-3.6-flash"
+    gemini_model: str = "gemini-3.5-flash-lite"
+    gemini_fallback_model: Optional[str] = "gemini-3.8-flash"
     email_delivery_mode: Literal["console", "smtp"] = "console"
     smtp_host: Optional[str] = None
     smtp_port: int = Field(default=587, ge=1, le=65_535)

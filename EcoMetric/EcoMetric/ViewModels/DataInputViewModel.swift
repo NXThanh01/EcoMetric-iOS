@@ -291,6 +291,9 @@ final class DataInputViewModel: ObservableObject {
 
     private func friendlyMessage(for error: Error) -> String {
         if savedDatasetAwaitingAI != nil {
+            if case let AIRecommendationAPIError.server(_, message) = error, let message {
+                return message
+            }
             if (error as? URLError)?.code == .timedOut {
                 return "Dữ liệu đã được lưu an toàn. AI đang phản hồi chậm; hãy thử phân tích lại."
             }

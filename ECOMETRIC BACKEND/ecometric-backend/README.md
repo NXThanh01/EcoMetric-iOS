@@ -12,8 +12,8 @@ flowchart LR
     API --> DB[(PostgreSQL)]
     DB --> TS[Time-series Engine v1.2]
     TS --> GM[Gemini Insight Service]
-    GM --> P[Gemini 3.8 Flash]
-    GM -. Khi quá tải .-> F[Gemini 3.6 Flash]
+    GM --> P[Gemini 3.5 Flash Lite]
+    GM -. Khi quá tải .-> F[Gemini 3.8 Flash]
     GM --> IOS
 ```
 
@@ -114,8 +114,8 @@ Phần diễn giải và khuyến nghị AI sử dụng Gemini API từ backend.
 
 ```text
 ECOMETRIC_GEMINI_API_KEY=api_key_cua_ban
-ECOMETRIC_GEMINI_MODEL=gemini-3.8-flash
-ECOMETRIC_GEMINI_FALLBACK_MODEL=gemini-3.6-flash
+ECOMETRIC_GEMINI_MODEL=gemini-3.5-flash-lite
+ECOMETRIC_GEMINI_FALLBACK_MODEL=gemini-3.8-flash
 ```
 
 3. Khởi động lại backend và kiểm tra `GET /health`. Trường `gemini` phải là `configured`.
@@ -123,7 +123,7 @@ ECOMETRIC_GEMINI_FALLBACK_MODEL=gemini-3.6-flash
 
 Backend luôn tính đường cơ sở, điện vượt mức và tỷ lệ bất thường trước. Gemini chỉ nhận dữ liệu đã kiểm tra để viết insight có cấu trúc, giả thuyết nguyên nhân và kế hoạch hành động. Prompt cấm Gemini tự tạo số liệu tài chính, tỷ lệ tiết kiệm hoặc xem giả thuyết là kết luận chắc chắn.
 
-`gemini-3.8-flash` là model chính. Nếu Google tạm thời trả lỗi quá tải, service sẽ thử lại và tự chuyển sang `gemini-3.6-flash`; trường `model` trong phản hồi luôn cho biết model thực tế đã tạo insight.
+`gemini-3.5-flash-lite` là model chính đã kiểm thử trực tiếp cho phân tích và chatbot. Khi quá tải/quota hoặc model không khả dụng, service chuyển sang `gemini-3.8-flash` mà không gọi lặp model lỗi. Mỗi yêu cầu có timeout 20 giây; lỗi tạm thời/JSON không hợp lệ được retry tối đa 2 lần với thời gian chờ tăng dần. SDK không tự retry thêm để tránh nhân số lần gọi. Lỗi quyền truy cập dừng ngay; phản hồi phân biệt quá tải, quota và cấu hình. Trường `model` cho biết model thực tế đã tạo insight. Tham khảo [hướng dẫn xử lý lỗi của Google](https://ai.google.dev/gemini-api/docs/troubleshooting).
 
 ### Cố vấn EcoMetric có kiểm chứng
 
