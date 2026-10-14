@@ -87,6 +87,8 @@ from services.auth_service import (
 )
 from services.email_service import EmailDeliveryError
 from settings import get_settings
+from workflow_schemas import ActionCreate, ActionUpdate, ActionResponse, ImpactRequest
+from services.workflow_service import list_datasets, save_insight, get_insight, create_action, list_actions, update_action, calculate_impact
 
 
 settings = get_settings()
@@ -98,7 +100,7 @@ app = FastAPI(
         "Time-series anomaly detection, knowledge retrieval, scoring, "
         "and calculation engine for EcoMetric."
     ),
-    version="1.3.2",
+    version="1.4.0",
     docs_url=None if is_production else "/docs",
     redoc_url=None if is_production else "/redoc",
     openapi_url=None if is_production else "/openapi.json",
@@ -434,16 +436,21 @@ def generate_saved_dataset_ai_insight(
     db: Session = Depends(get_db),
 ) -> GeminiDatasetInsightResponse:
     try:
+        try:
+            return GeminiDatasetInsightResponse.model_validate(get_insight(db, dataset_id, user.organization_id))
+        except ResourceNotFoundError:
+            pass
         dataset = get_dataset(db, dataset_id, user.organization_id)
         data = build_time_series_input(db, dataset_id, user.organization_id)
         analysis = analyze_time_series(data)
-        return GeminiInsightService().generate_dataset_insight(
+        response = GeminiInsightService().generate_dataset_insight(
             dataset_id=dataset_id,
             data=data,
             analysis=analysis,
             operational_context=dataset.operational_context,
             desired_outcome=dataset.desired_outcome,
         )
+        return save_insight(db, dataset_id, response)
     except ResourceNotFoundError as error:
         raise HTTPException(status_code=404, detail=str(error)) from error
     except ResourceConflictError as error:
@@ -486,6 +493,61 @@ def ask_saved_dataset_advisor(
         raise HTTPException(status_code=503, detail=str(error)) from error
     except GeminiGenerationError as error:
         raise HTTPException(status_code=502, detail=str(error)) from error
+
+
+@app.get("/v1/datasets", response_model=list[DatasetDetailResponse])
+def dataset_history(user: User = Depends(ready_user), db: Session = Depends(get_db)):
+    return [DatasetDetailResponse(**DatasetResponse.model_validate(row).model_dump(),
+        facility_name=row.facility.name, meter_name=row.meter.name if row.meter else None)
+        for row in list_datasets(db, user.organization_id)]
+
+
+@app.get("/v1/datasets/{dataset_id}/ai-insight", response_model=GeminiDatasetInsightResponse)
+def saved_insight(dataset_id: uuid.UUID, user: User = Depends(ready_user), db: Session = Depends(get_db)):
+    try:
+        return get_insight(db, dataset_id, user.organization_id)
+    except ResourceNotFoundError as error:
+        raise HTTPException(404, str(error)) from error
+
+
+@app.get("/v1/datasets/{dataset_id}/actions", response_model=list[ActionResponse])
+def dataset_actions(dataset_id: uuid.UUID, user: User = Depends(ready_user), db: Session = Depends(get_db)):
+    try:
+        return list_actions(db, dataset_id, user.organization_id)
+    except ResourceNotFoundError as error:
+        raise HTTPException(404, str(error)) from error
+
+
+@app.post("/v1/datasets/{dataset_id}/actions", response_model=ActionResponse, status_code=201)
+def add_action(dataset_id: uuid.UUID, data: ActionCreate, user: User = Depends(ready_user), db: Session = Depends(get_db)):
+    try:
+        return create_action(db, dataset_id, user.organization_id, data)
+    except ResourceNotFoundError as error:
+        raise HTTPException(404, str(error)) from error
+    except ResourceConflictError as error:
+        raise HTTPException(422, str(error)) from error
+
+
+@app.patch("/v1/actions/{action_id}", response_model=ActionResponse)
+def edit_action(action_id: uuid.UUID, data: ActionUpdate, user: User = Depends(ready_user), db: Session = Depends(get_db)):
+    if user.role not in {"owner", "admin"}:
+        raise HTTPException(403, "Chỉ quản lý được cập nhật và phân công công việc")
+    try:
+        return update_action(db, action_id, user.organization_id, data)
+    except ResourceNotFoundError as error:
+        raise HTTPException(404, str(error)) from error
+    except ResourceConflictError as error:
+        raise HTTPException(422, str(error)) from error
+
+
+@app.post("/v1/datasets/{dataset_id}/impact")
+def dataset_impact(dataset_id: uuid.UUID, data: ImpactRequest, user: User = Depends(ready_user), db: Session = Depends(get_db)):
+    try:
+        return calculate_impact(db, dataset_id, user.organization_id, data)
+    except ResourceNotFoundError as error:
+        raise HTTPException(404, str(error)) from error
+    except ResourceConflictError as error:
+        raise HTTPException(422, str(error)) from error
 
 
 @app.get("/knowledge/led")

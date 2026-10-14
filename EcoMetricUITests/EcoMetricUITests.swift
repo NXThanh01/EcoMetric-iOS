@@ -9,6 +9,20 @@ import XCTest
 
 final class EcoMetricUITests: XCTestCase {
 
+    @MainActor
+    func testMoLichSuBaoCaoKhongCoDuLieu() throws {
+        let app = XCUIApplication()
+        app.launchArguments.append("--ui-testing")
+        app.launch()
+        let reports = app.tabBars.buttons["Báo cáo"]
+        XCTAssertTrue(reports.waitForExistence(timeout: 10))
+        reports.tap()
+        let history = app.buttons["Lịch sử dữ liệu và báo cáo"]
+        XCTAssertTrue(history.waitForExistence(timeout: 5))
+        history.tap()
+        XCTAssertTrue(app.navigationBars["Lịch sử báo cáo"].waitForExistence(timeout: 5))
+    }
+
     override func setUpWithError() throws {
         // Dừng ngay khi một bước kiểm thử giao diện thất bại.
         continueAfterFailure = false

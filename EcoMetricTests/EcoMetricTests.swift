@@ -512,6 +512,14 @@ struct EcoMetricTests {
         #expect(data.starts(with: Data("%PDF".utf8)))
         #expect(data.count > 2_000)
         #expect((document?.numberOfPages ?? 0) >= 1)
+        let engineOnly = SavedEnergyAnalysis.engineOnly(dataset: result.dataset, points: points, analysis: analysis)
+        #expect(!engineOnly.hasAIInsight)
+        #expect(engineOnly.gemini.insight.recommendations.isEmpty)
+        #expect(engineOnly.analysis.summary?.totalExcessKWh == 60)
+        let cached = try JSONDecoder().decode(SavedEnergyAnalysis.self, from: JSONEncoder().encode(engineOnly))
+        #expect(!cached.hasAIInsight)
+        let engineURL = try EnergyReportPDFService().createReport(from: engineOnly)
+        #expect((CGPDFDocument(engineURL as CFURL)?.numberOfPages ?? 0) >= 1)
     }
 
 }

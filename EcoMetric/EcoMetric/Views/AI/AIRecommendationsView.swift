@@ -583,7 +583,7 @@ private extension AIRecommendationsView {
                     spacing: 3
                 ) {
 
-                    Text("AI Insight")
+                    Text("AI phân tích")
                         .font(.headline)
                         .foregroundStyle(
                             EcoTheme.navy

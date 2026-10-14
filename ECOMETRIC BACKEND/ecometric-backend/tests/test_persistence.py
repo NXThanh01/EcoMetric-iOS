@@ -30,9 +30,68 @@ from services.data_store_service import (  # noqa: E402
     list_measurements,
 )
 from services.time_series_service import analyze_time_series  # noqa: E402
+from services.workflow_service import calculate_impact, create_action, list_actions, list_datasets, update_action, get_insight, save_insight
+from workflow_schemas import ImpactRequest, ActionCreate, ActionUpdate
 
 
 class PersistenceTests(unittest.TestCase):
+    def _workflow_dataset(self, session, organization, start, consumption, production):
+        facilities = list_facilities(session, organization.id)
+        facility = facilities[0] if facilities else create_facility(session, FacilityCreate(name="Xưởng đo lại"), organization.id)
+        return create_electricity_dataset(session, ElectricityDatasetCreate(facility_id=facility.id,
+            points=[EnergyTimeSeriesPoint(timestamp=start + timedelta(days=i), consumption_kwh=consumption,
+                production_units=production) for i in range(7)]), organization.id)
+
+    def test_impact_normalizes_production_and_calculates_verified_inputs(self):
+        with self.session_factory() as session:
+            organization = self._make_organization(session)
+            before = self._workflow_dataset(session, organization, datetime(2026, 10, 1), 100, 10)
+            after = self._workflow_dataset(session, organization, datetime(2026, 10, 8), 160, 20)
+            result = calculate_impact(session, before.id, organization.id, ImpactRequest(after_dataset_id=after.id,
+                electricity_price_vnd=2000, investment_vnd=1920000, emission_factor_kg_per_kwh=0.5, factor_source="Tài liệu kiểm thử 2026"))
+            self.assertEqual(result["basis"], "production")
+            self.assertEqual(result["saving_kwh"], 280)
+            self.assertEqual(result["saving_vnd"], 560000)
+            self.assertEqual(result["avoided_co2_kg"], 140)
+            self.assertAlmostEqual(result["payback_months"], 0.8)
+
+    def test_impact_rejects_overlap_and_unreferenced_factor(self):
+        with self.assertRaises(ValidationError):
+            ImpactRequest(after_dataset_id=uuid.uuid4(), emission_factor_kg_per_kwh=0.5)
+        with self.session_factory() as session:
+            organization = self._make_organization(session)
+            before = self._workflow_dataset(session, organization, datetime(2026, 10, 1), 100, 10)
+            after = self._workflow_dataset(session, organization, datetime(2026, 10, 4), 80, 10)
+            with self.assertRaises(ResourceConflictError):
+                calculate_impact(session, before.id, organization.id, ImpactRequest(after_dataset_id=after.id))
+
+    def test_actions_and_history_are_tenant_isolated(self):
+        with self.session_factory() as session:
+            organization = self._make_organization(session)
+            other = self._make_organization(session)
+            before = self._workflow_dataset(session, organization, datetime(2026, 10, 1), 100, 10)
+            task = create_action(session, before.id, organization.id, ActionCreate(title="Kiểm tra máy", verification_metric="kWh/sản phẩm"))
+            self.assertEqual(len(list_datasets(session, organization.id)), 1)
+            self.assertEqual(len(list_datasets(session, other.id)), 0)
+            self.assertEqual(len(list_actions(session, before.id, organization.id)), 1)
+            with self.assertRaises(ResourceNotFoundError):
+                list_actions(session, before.id, other.id)
+            with self.assertRaises(ResourceNotFoundError):
+                update_action(session, task.id, other.id, ActionUpdate(status="completed"))
+            with self.assertRaises(ResourceConflictError):
+                update_action(session, task.id, organization.id, ActionUpdate(status="planned", assignee_email="outside@example.com"))
+
+    def test_insight_is_saved_and_requires_own_tenant(self):
+        from types import SimpleNamespace
+        with self.session_factory() as session:
+            organization = self._make_organization(session)
+            other = self._make_organization(session)
+            before = self._workflow_dataset(session, organization, datetime(2026, 10, 1), 100, 10)
+            response = SimpleNamespace(model_dump=lambda **_: {"headline": "Báo cáo đã lưu"})
+            save_insight(session, before.id, response)
+            self.assertEqual(get_insight(session, before.id, organization.id)["headline"], "Báo cáo đã lưu")
+            with self.assertRaises(ResourceNotFoundError):
+                get_insight(session, before.id, other.id)
     @classmethod
     def setUpClass(cls):
         cls.engine = create_engine(

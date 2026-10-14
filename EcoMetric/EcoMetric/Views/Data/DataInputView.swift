@@ -13,6 +13,7 @@ struct DataInputView: View {
 
     @StateObject private var viewModel = DataInputViewModel()
     @EnvironmentObject private var analysisStore: AppAnalysisStore
+    @EnvironmentObject private var account: AccountSession
 
     var body: some View {
         NavigationStack {
@@ -268,12 +269,13 @@ struct DataInputView: View {
     private var actionButton: some View {
         Button {
             Task {
+                let organizationID = account.organization?.id
                 if viewModel.canRetryAI {
                     await viewModel.retryAIAnalysis()
                 } else {
                     await viewModel.saveAndAnalyze()
                 }
-                if let result = viewModel.result {
+                if organizationID == account.organization?.id, let result = viewModel.result {
                     analysisStore.latestAnalysis = result
                 }
             }
@@ -327,7 +329,7 @@ struct DataInputView: View {
             statusCard(
                 icon: "brain.head.profile",
                 title: "Đang tạo báo cáo phân tích",
-                subtitle: "Engine đã tính số liệu. Gemini có thể cần tối đa 2 phút để hoàn thiện giải pháp."
+                subtitle: "Engine đã tính số liệu. AI có thể cần tối đa 2 phút để hoàn thiện giải pháp."
             )
         case .completed:
             EmptyView()
@@ -371,7 +373,7 @@ struct DataInputView: View {
                     .font(.headline)
                     .foregroundStyle(EcoTheme.darkGreen)
                 Spacer()
-                Text("AI ĐỀ XUẤT • \(result.gemini.model)")
+                Text(result.hasAIInsight ? "AI PHÂN TÍCH" : "ENGINE CALCULATOR")
                     .font(.caption.bold())
                     .foregroundStyle(EcoTheme.blue)
             }
@@ -509,7 +511,7 @@ struct DataInputView: View {
                 .buttonStyle(.bordered)
                 .tint(EcoTheme.green)
 
-                Button("AI Insight") {
+                Button("AI phân tích") {
                     onOpenAI()
                 }
                 .buttonStyle(.bordered)

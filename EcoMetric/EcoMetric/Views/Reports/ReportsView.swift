@@ -18,14 +18,23 @@ struct ReportsView: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 18) {
                     header
+                    NavigationLink("Lịch sử dữ liệu và báo cáo", destination: DatasetHistoryView())
+                        .font(.headline)
                     if let result = analysisStore.latestAnalysis {
                         provenanceCard(result)
                         engineOverview(result)
                         consumptionChart(result)
                         energyBreakdown(result)
                         anomalySection(result)
-                        aiSummary(result)
-                        recommendationSection(result)
+                        if result.hasAIInsight {
+                            aiSummary(result)
+                            recommendationSection(result)
+                        } else {
+                            Text("Báo cáo Engine đã sẵn sàng. AI tạm thời chưa phản hồi; mở lại dataset từ Lịch sử để thử phân tích AI.")
+                                .foregroundStyle(EcoTheme.textSecondary)
+                        }
+                        NavigationLink("Quản lý công việc & đo hiệu quả", destination: OperationalWorkflowView(result: result))
+                            .font(.headline)
                         advisorSection(result)
                         exportSection(result)
                     } else {
@@ -68,7 +77,7 @@ struct ReportsView: View {
                 .foregroundStyle(EcoTheme.navy)
             Text(
                 "Biểu đồ và chỉ số lấy từ số đo thực tế. Nhận định và giải pháp "
-                + "do Gemini tạo luôn được đánh dấu rõ ràng."
+                + "do AI phân tích luôn được đánh dấu rõ ràng."
             )
             .font(.subheadline)
             .foregroundStyle(EcoTheme.textSecondary)
@@ -273,7 +282,7 @@ struct ReportsView: View {
         VStack(alignment: .leading, spacing: 10) {
             sectionHeader(
                 "Nhận định điều hành",
-                subtitle: "Gemini diễn giải từ các chỉ số đã kiểm chứng",
+                subtitle: "AI phân tích từ các chỉ số đã kiểm chứng",
                 source: .ai
             )
             Text(result.gemini.insight.headline)

@@ -269,9 +269,15 @@ final class DataInputViewModel: ObservableObject {
         points: [EnergyTimeSeriesPoint]
     ) async throws {
         uploadState = .analyzing
-        let gemini = try await service.generateGeminiInsight(
-            datasetID: dataset.id
-        )
+        let gemini: GeminiDatasetInsightResponse
+        do {
+            gemini = try await service.generateGeminiInsight(datasetID: dataset.id)
+        } catch {
+            let analysis = try await service.analyzeDataset(id: dataset.id)
+            result = .engineOnly(dataset: dataset, points: points, analysis: analysis)
+            uploadState = .idle
+            throw error
+        }
         result = SavedEnergyAnalysis(
             dataset: dataset,
             points: points,
@@ -286,7 +292,7 @@ final class DataInputViewModel: ObservableObject {
     private func friendlyMessage(for error: Error) -> String {
         if savedDatasetAwaitingAI != nil {
             if (error as? URLError)?.code == .timedOut {
-                return "Dữ liệu đã được lưu an toàn. Gemini đang phản hồi chậm; hãy thử phân tích AI lại."
+                return "Dữ liệu đã được lưu an toàn. AI đang phản hồi chậm; hãy thử phân tích lại."
             }
             return "Dữ liệu đã được lưu an toàn nhưng AI chưa tạo được phân tích. Hãy thử lại, hệ thống sẽ không lưu trùng dữ liệu."
         }

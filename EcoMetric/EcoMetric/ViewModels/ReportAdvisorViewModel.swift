@@ -25,6 +25,7 @@ final class ReportAdvisorViewModel: ObservableObject {
 
     private let service: OperationalDataAPIService
     private var activeDatasetID: UUID?
+    private var conversationID = UUID()
 
     init(service: OperationalDataAPIService? = nil) {
         self.service = service ?? OperationalDataAPIService()
@@ -33,6 +34,7 @@ final class ReportAdvisorViewModel: ObservableObject {
     func prepare(datasetID: UUID) {
         guard activeDatasetID != datasetID else { return }
         activeDatasetID = datasetID
+        conversationID = UUID()
         question = ""
         messages = []
         errorMessage = nil
@@ -51,6 +53,7 @@ final class ReportAdvisorViewModel: ObservableObject {
         }
 
         prepare(datasetID: datasetID)
+        let requestConversationID = conversationID
         let history = messages.suffix(8).map {
             AdvisorHistoryMessage(
                 role: $0.sender == .user ? "user" : "assistant",
@@ -70,7 +73,7 @@ final class ReportAdvisorViewModel: ObservableObject {
         question = ""
         errorMessage = nil
         isSending = true
-        defer { isSending = false }
+        defer { if conversationID == requestConversationID { isSending = false } }
 
         do {
             let response = try await service.askAdvisor(
@@ -78,6 +81,7 @@ final class ReportAdvisorViewModel: ObservableObject {
                 question: normalizedQuestion,
                 history: Array(history)
             )
+            guard conversationID == requestConversationID else { return }
             messages.append(
                 AdvisorChatEntry(
                     sender: .advisor,
@@ -89,6 +93,7 @@ final class ReportAdvisorViewModel: ObservableObject {
                 )
             )
         } catch {
+            guard conversationID == requestConversationID else { return }
             errorMessage = friendlyMessage(for: error)
         }
     }

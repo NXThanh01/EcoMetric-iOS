@@ -63,7 +63,7 @@ class GeminiInsightService:
     ) -> GeminiDatasetInsightResponse:
         if not self.is_configured:
             raise GeminiNotConfiguredError(
-                "Gemini API chưa được cấu hình trên backend"
+                "Dịch vụ AI chưa được cấu hình trên backend"
             )
 
         client = self.client or genai.Client(api_key=self.api_key)
@@ -108,7 +108,7 @@ class GeminiInsightService:
 
         if narrative is None:
             raise GeminiGenerationError(
-                "Không thể tạo AI Insight từ Gemini"
+                "AI đang bận hoặc chưa phản hồi. Số đo đã lưu; hãy thử phân tích lại sau."
             ) from last_error
 
         return GeminiDatasetInsightResponse(
@@ -132,7 +132,7 @@ class GeminiInsightService:
     ) -> DatasetAdvisorResponse:
         if not self.is_configured:
             raise GeminiNotConfiguredError(
-                "Gemini API chưa được cấu hình trên backend"
+                "Dịch vụ AI chưa được cấu hình trên backend"
             )
 
         client = self.client or genai.Client(api_key=self.api_key)
@@ -180,7 +180,7 @@ class GeminiInsightService:
                     text = getattr(response, "text", None)
                     if not text:
                         raise GeminiGenerationError(
-                            "Gemini không trả về nội dung tư vấn"
+                            "AI chưa trả về nội dung tư vấn"
                         )
                     return schema.model_validate_json(text), candidate_model
                 except Exception as error:
@@ -207,7 +207,7 @@ class GeminiInsightService:
         text = getattr(response, "text", None)
         if not text:
             raise GeminiGenerationError(
-                "Gemini không trả về nội dung phân tích"
+                "AI chưa trả về nội dung phân tích"
             )
         return GeminiNarrative.model_validate_json(text)
 

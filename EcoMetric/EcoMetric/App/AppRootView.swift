@@ -47,6 +47,12 @@ struct AppRootView: View {
         }
         .environmentObject(analysisStore)
         .environmentObject(accountSession)
+        .onChange(of: accountSession.organization?.id, initial: true) { _, id in
+            analysisStore.activateOrganization(id)
+        }
+        .task(id: accountSession.organization?.id) {
+            await analysisStore.restoreFromServer()
+        }
         .task {
 
             guard !isRunningUITests else { return }

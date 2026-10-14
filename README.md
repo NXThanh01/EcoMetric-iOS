@@ -36,7 +36,7 @@ EcoMetric hướng tới một vòng lặp cải tiến liên tục cho hoạt �
 - chuẩn bị dữ liệu cho ESG và Carbon Reporting.
 
 > [!IMPORTANT]
-> EcoMetric hiện là **MVP đang phát triển**. Luồng đăng ký doanh nghiệp, phân quyền nhân viên, nhập dữ liệu điện, lưu PostgreSQL, phát hiện bất thường, tạo AI Insight bằng Gemini và xuất báo cáo năng lượng PDF đã hoạt động end-to-end. Dashboard vẫn còn sử dụng một phần dữ liệu minh họa; Carbon Reporting chỉ được bật sau khi có emission factor đã xác thực.
+> EcoMetric hiện là **MVP đang phát triển**. Luồng đăng ký doanh nghiệp, phân quyền nhân viên, nhập dữ liệu điện, lưu PostgreSQL, phát hiện bất thường, AI phân tích và xuất báo cáo năng lượng PDF đã hoạt động. Dashboard dùng dataset thực; báo cáo AI và công việc được lưu trên server. So sánh trước/sau chuẩn hóa theo dữ liệu vận hành. CO₂e chỉ được tính khi nhập hệ số kèm nguồn/năm; người dùng cần xác minh phạm vi áp dụng của nguồn này.
 
 ## 🔄 Product workflow
 
@@ -89,15 +89,16 @@ flowchart TD
 
 | Module | Nội dung | Trạng thái |
 |---|---|:---:|
-| Dashboard | CO₂e, chi phí, tiềm năng tiết kiệm, biểu đồ xu hướng | 🟡 Mock data |
+| Dashboard | Tổng điện năng, đường cơ sở, bất thường, biểu đồ và hành động từ dataset thực | 🟢 Hoạt động |
 | Data Input | Nhập số liệu điện, sản lượng, giờ vận hành và lưu PostgreSQL | 🟢 Hoạt động |
 | Time-series Engine | Đường cơ sở, chuẩn hóa, anomaly detection và chẩn đoán định lượng | 🟢 Engine v1.2 |
-| Gemini AI Insight | Diễn giải dữ liệu thật, giả thuyết nguyên nhân và hành động kiểm chứng | 🟢 Hoạt động |
+| AI phân tích | Diễn giải dữ liệu thật, giả thuyết nguyên nhân và hành động kiểm chứng | 🟢 Hoạt động |
 | Cố vấn EcoMetric | Chat ngay trong báo cáo, câu trả lời neo vào dataset, Engine và bối cảnh vận hành | 🟢 Hoạt động |
 | Recommendation Engine | Kịch bản, xếp hạng và giải thích giải pháp tiết kiệm | 🟢 Engine v1.0 |
 | Solution Detail | Chỉ số tiết kiệm, hoàn vốn, nguồn và metadata | 🟢 Hoạt động |
-| Action Plan | Các bước triển khai, người phụ trách, deadline, KPI | 🟢 MVP |
-| Remeasure | So sánh trước và sau triển khai | 🟡 MVP demo |
+| Action Plan | Tạo việc từ AI, giao thành viên, hạn hoàn thành, trạng thái và KPI; lưu PostgreSQL | 🟢 MVP |
+| Remeasure | Hai dataset thực, cùng đồng hồ; chuẩn hóa theo sản lượng/giờ/kỳ, tiền tiết kiệm và hoàn vốn ngoại suy | 🟢 MVP |
+| Lịch sử báo cáo | Chọn cơ sở/kỳ, mở AI đã lưu, hiệu chỉnh số đo thành phiên bản dữ liệu mới | 🟢 MVP |
 | Energy Reports | Chỉ số và biểu đồ từ số đo thật, giải pháp AI và xuất PDF A4 | 🟢 Hoạt động |
 | ESG / Carbon Reports | Chờ Carbon Engine và emission factor đã xác thực | ⚪ Kế hoạch |
 | Enterprise Account | Đăng ký công ty qua OTP email, đăng nhập và phiên bảo mật trong Keychain | 🟢 Hoạt động |
@@ -105,6 +106,19 @@ flowchart TD
 | Tenant Isolation | Tách cơ sở, dataset và số đo theo từng doanh nghiệp | 🟢 Hoạt động |
 
 ## 🏗️ Kiến trúc hệ thống
+
+### Bản local 1.4.0 — chuẩn bị kiểm thử ngày 15/10/2026
+
+1. Trong thư mục backend, chạy `venv/bin/alembic upgrade head` rồi `venv/bin/python run.py`.
+2. Nhập hai bộ dữ liệu cùng cơ sở và cùng tên đồng hồ: tối thiểu 7 ngày trước triển khai và 7 ngày sau, không chồng lấn ngày.
+3. Trong **Báo cáo → Lịch sử dữ liệu và báo cáo**, chọn kỳ cơ sở. Báo cáo đã có AI được mở lại từ server; nếu chưa có AI, ứng dụng chạy phân tích và lưu kết quả.
+4. Mở **Quản lý công việc & đo hiệu quả**, tạo việc từ đề xuất AI. Chủ/admin có thể phân công thành viên đang hoạt động, đặt hạn, ghi chú và cập nhật tiến độ.
+5. Chọn kỳ sau triển khai, nhập giá điện thực tế; chi phí đầu tư và hệ số phát thải kèm nguồn/năm là tùy chọn. Nhấn **Tính hiệu quả thực tế**.
+6. Vuốt sang phải một bộ dữ liệu trong lịch sử để **Sửa số đo**. Hệ thống lưu phiên bản mới, giữ nguyên báo cáo cũ; mở phiên bản mới để phân tích lại.
+
+Lưu ý: danh sách hiện hiển thị 100 dataset gần nhất. Đo lại là so sánh quan sát, chưa chứng minh tiết kiệm chỉ do giải pháp; hoàn vốn ngoại suy theo 30 ngày từ kỳ đo sau. Hệ số do người dùng nhập chưa được hệ thống xác thực tự động. Backend cần chạy khi quay demo; gửi OTP/thư mời và tạo phân tích mới phụ thuộc dịch vụ email/AI.
+
+Khi AI quá tải hoặc phản hồi lỗi, số đo vẫn được lưu và ứng dụng có thể hiển thị biểu đồ, bất thường, xuất PDF bằng Engine Calculator. Phần này được đánh dấu đang chờ AI; tab AI có nút thử lại. Hệ thống không tạo nội dung AI giả để thay thế lỗi dịch vụ.
 
 ```mermaid
 flowchart TB

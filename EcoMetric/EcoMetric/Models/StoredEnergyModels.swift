@@ -171,11 +171,65 @@ struct EnergyMeasurementDraft: Identifiable {
     }
 }
 
-struct SavedEnergyAnalysis {
+struct SavedEnergyAnalysis: Codable {
     let dataset: StoredDatasetResponse
     let points: [EnergyTimeSeriesPoint]
     let analysis: EnergyTimeSeriesAnalysisResponse
     let gemini: GeminiDatasetInsightResponse
+
+    var hasAIInsight: Bool { gemini.provider == "gemini" }
+
+    static func engineOnly(dataset: StoredDatasetResponse, points: [EnergyTimeSeriesPoint], analysis: EnergyTimeSeriesAnalysisResponse) -> SavedEnergyAnalysis {
+        SavedEnergyAnalysis(dataset: dataset, points: points, analysis: analysis,
+            gemini: GeminiDatasetInsightResponse(provider: "engine", model: "", generatedAt: ISO8601DateFormatter().string(from: Date()),
+                datasetID: dataset.id, facility: analysis.facility, quantitativeAnalysis: analysis,
+                insight: GeminiNarrativeResponse(headline: "AI chưa sẵn sàng. Số liệu Engine đã được tính toán.",
+                    executiveSummary: "Số đo đã lưu an toàn. Có thể xem biểu đồ, bất thường và xuất báo cáo Engine; thử phân tích AI lại khi dịch vụ hoạt động.",
+                    rootCauses: [], recommendations: [], caveats: ["Chưa có nhận định hoặc giải pháp do AI sinh."], followUpQuestions: [])))
+    }
+}
+
+struct ActionTaskResponse: Decodable, Identifiable {
+    let id: UUID
+    let dataset_id: UUID
+    let title: String
+    let verification_metric: String
+    let assignee_email: String?
+    let due_date: String?
+    let status: String
+    let notes: String
+}
+
+struct ActionCreateRequest: Encodable {
+    let title: String
+    let verification_metric: String
+}
+
+struct ActionUpdateRequest: Encodable {
+    let status: String
+    let assignee_email: String?
+    let due_date: String?
+    let notes: String
+}
+
+struct ImpactRequest: Encodable {
+    let after_dataset_id: UUID
+    let electricity_price_vnd: Double?
+    let investment_vnd: Double?
+    let emission_factor_kg_per_kwh: Double?
+    let factor_source: String?
+}
+
+struct ImpactResponse: Decodable {
+    let basis: String
+    let expected_kwh: Double
+    let actual_kwh: Double
+    let saving_kwh: Double
+    let reduction_percent: Double
+    let saving_vnd: Double?
+    let avoided_co2_kg: Double?
+    let payback_months: Double?
+    let caveat: String
 }
 
 struct GeminiDatasetInsightResponse: Codable {

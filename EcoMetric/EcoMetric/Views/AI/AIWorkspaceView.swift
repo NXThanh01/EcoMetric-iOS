@@ -5,6 +5,8 @@ struct AIWorkspaceView: View {
     let onOpenData: () -> Void
 
     @EnvironmentObject private var analysisStore: AppAnalysisStore
+    @State private var isRetrying = false
+    @State private var retryError: String?
 
     var body: some View {
         NavigationStack {
@@ -14,11 +16,30 @@ struct AIWorkspaceView: View {
 
                     if let result = analysisStore.latestAnalysis {
                         sourceLegend
-                        managementSummary(result)
+                        if result.hasAIInsight { managementSummary(result) }
                         engineSection(result)
                         energyChart(result)
-                        aiDiagnosisSection(result)
-                        aiSolutionsSection(result)
+                        if result.hasAIInsight {
+                            aiDiagnosisSection(result)
+                            aiSolutionsSection(result)
+                        } else {
+                            Text("AI tạm thời chưa sẵn sàng. Số đo và chỉ số Engine đã được lưu; vào Lịch sử báo cáo để thử phân tích lại.")
+                                .foregroundStyle(EcoTheme.textSecondary)
+                            Button(isRetrying ? "Đang phân tích…" : "Thử phân tích AI lại") {
+                                Task {
+                                    isRetrying = true
+                                    retryError = nil
+                                    defer { isRetrying = false }
+                                    do {
+                                        let loaded = try await OperationalDataAPIService().loadAnalysis(dataset: result.dataset)
+                                        guard analysisStore.latestAnalysis?.dataset.id == result.dataset.id else { return }
+                                        analysisStore.latestAnalysis = loaded
+                                        if !loaded.hasAIInsight { retryError = "Dịch vụ AI vẫn chưa sẵn sàng. Báo cáo Engine vẫn sử dụng được." }
+                                    } catch { retryError = error.localizedDescription }
+                                }
+                            }.disabled(isRetrying)
+                            if let retryError { Text(retryError).foregroundStyle(.red).font(.caption) }
+                        }
                         limitationsSection(result)
                     } else {
                         emptyState
@@ -29,7 +50,7 @@ struct AIWorkspaceView: View {
                 .padding(.bottom, 110)
             }
             .background(EcoTheme.background.ignoresSafeArea())
-            .navigationTitle("AI Insight")
+            .navigationTitle("AI phân tích")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
@@ -41,7 +62,7 @@ struct AIWorkspaceView: View {
                 .foregroundStyle(EcoTheme.navy)
 
             Text(
-                "Số liệu được calculator kiểm chứng trước khi Gemini phân tích "
+                "Số liệu được Engine kiểm chứng trước khi AI phân tích "
                 + "nguyên nhân và đề xuất hành động."
             )
             .font(.subheadline)
@@ -95,7 +116,7 @@ struct AIWorkspaceView: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             Label(
-                "\(result.gemini.model) • \(result.dataset.recordCount) điểm đo thật",
+                "AI phân tích • \(result.dataset.recordCount) điểm đo thật",
                 systemImage: "checkmark.shield.fill"
             )
             .font(.caption)

@@ -76,12 +76,12 @@ private struct PDFWriter {
             color: secondary,
             spacingAfter: 16
         )
-        sourceLegend()
-        executiveSummary(result)
+        sourceLegend(includeAI: result.hasAIInsight)
+        if result.hasAIInsight { executiveSummary(result) }
         engineMetrics(result)
         consumptionChart(result)
         anomalyTable(result)
-        aiSection(result)
+        if result.hasAIInsight { aiSection(result) }
         caveatSection(result)
         footer()
     }
@@ -153,12 +153,9 @@ private struct PDFWriter {
         )
     }
 
-    private mutating func sourceLegend() {
+    private mutating func sourceLegend(includeAI: Bool) {
         ensureSpace(34)
-        let values = [
-            ("ENGINE CALCULATOR", blue),
-            ("AI ĐỀ XUẤT", green)
-        ]
+        let values = includeAI ? [("ENGINE CALCULATOR", blue), ("AI ĐỀ XUẤT", green)] : [("ENGINE CALCULATOR", blue)]
         var x = margin
         for (title, color) in values {
             let width = (title as NSString).size(
@@ -327,7 +324,7 @@ private struct PDFWriter {
 
     private mutating func caveatSection(_ result: SavedEnergyAnalysis) {
         guard !result.gemini.insight.caveats.isEmpty else { return }
-        sectionTitle("Giới hạn dữ liệu", label: "AI đề xuất")
+        sectionTitle("Giới hạn dữ liệu", label: result.hasAIInsight ? "AI đề xuất" : "Engine Calculator")
         for caveat in result.gemini.insight.caveats {
             text(
                 "• \(caveat)",
@@ -357,7 +354,7 @@ private struct PDFWriter {
     }
 
     private func periodText(_ result: SavedEnergyAnalysis) -> String {
-        "Dữ liệu thực tế • \(result.dataset.recordCount) điểm đo • \(shortDate(result.dataset.periodStart)) - \(shortDate(result.dataset.periodEnd)) • Engine \(result.analysis.engineVersion) • Gemini \(result.gemini.model)"
+        "Dữ liệu thực tế • \(result.dataset.recordCount) điểm đo • \(shortDate(result.dataset.periodStart)) - \(shortDate(result.dataset.periodEnd)) • Engine \(result.analysis.engineVersion)" + (result.hasAIInsight ? " • AI phân tích" : " • Chờ AI")
     }
 
     private func shortDate(_ value: String?) -> String {

@@ -40,6 +40,54 @@ struct OperationalDataAPIService {
         )
     }
 
+    func listDatasets() async throws -> [StoredDatasetResponse] {
+        try await send(path: "v1/datasets", method: "GET", responseType: [StoredDatasetResponse].self)
+    }
+
+    func measurements(datasetID: UUID) async throws -> [EnergyTimeSeriesPoint] {
+        try await send(path: "v1/datasets/\(datasetID)/measurements", method: "GET", responseType: [EnergyTimeSeriesPoint].self)
+    }
+
+    func meterName(datasetID: UUID) async throws -> String {
+        struct Detail: Decodable { let meter_name: String? }
+        let detail = try await send(path: "v1/datasets/\(datasetID)", method: "GET", responseType: Detail.self)
+        return detail.meter_name ?? "Đồng hồ điện tổng"
+    }
+
+    func loadAnalysis(dataset: StoredDatasetResponse, generateIfMissing: Bool = true) async throws -> SavedEnergyAnalysis {
+        let insight: GeminiDatasetInsightResponse
+        do {
+            insight = try await send(path: "v1/datasets/\(dataset.id)/ai-insight", method: "GET", responseType: GeminiDatasetInsightResponse.self)
+        } catch AIRecommendationAPIError.server(let code, _) where code == 404 && generateIfMissing {
+            do {
+                insight = try await generateGeminiInsight(datasetID: dataset.id)
+            } catch {
+                let analysis = try await analyzeDataset(id: dataset.id)
+                let points = try await measurements(datasetID: dataset.id)
+                return .engineOnly(dataset: dataset, points: points, analysis: analysis)
+            }
+        }
+        let points = try await send(path: "v1/datasets/\(dataset.id)/measurements", method: "GET", responseType: [EnergyTimeSeriesPoint].self)
+        return SavedEnergyAnalysis(dataset: dataset, points: points, analysis: insight.quantitativeAnalysis, gemini: insight)
+    }
+
+    func listActions(datasetID: UUID) async throws -> [ActionTaskResponse] {
+        try await send(path: "v1/datasets/\(datasetID)/actions", method: "GET", responseType: [ActionTaskResponse].self)
+    }
+
+    func createAction(datasetID: UUID, recommendation: GeminiRecommendationResponse) async throws -> ActionTaskResponse {
+        try await send(path: "v1/datasets/\(datasetID)/actions", method: "POST",
+            payload: ActionCreateRequest(title: recommendation.title, verification_metric: recommendation.verificationMetric), responseType: ActionTaskResponse.self)
+    }
+
+    func updateAction(id: UUID, request: ActionUpdateRequest) async throws -> ActionTaskResponse {
+        try await send(path: "v1/actions/\(id)", method: "PATCH", payload: request, responseType: ActionTaskResponse.self)
+    }
+
+    func calculateImpact(datasetID: UUID, request: ImpactRequest) async throws -> ImpactResponse {
+        try await send(path: "v1/datasets/\(datasetID)/impact", method: "POST", payload: request, responseType: ImpactResponse.self)
+    }
+
     func createFacility(name: String) async throws -> FacilityResponse {
         try await send(
             path: "v1/facilities",
