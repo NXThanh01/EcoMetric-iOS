@@ -73,6 +73,48 @@ final class DataInputViewModel: ObservableObject {
         measurements.append(EnergyMeasurementDraft(date: nextDate))
     }
 
+    func loadDemoAnomalyData() {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let consumptions = [
+            1_180, 1_205, 1_195, 1_220, 1_210, 1_230, 1_215,
+            1_245, 1_260, 1_250, 1_275, 1_290, 1_820, 1_340
+        ]
+        let productions = [
+            118, 120, 119, 121, 120, 122, 121,
+            123, 124, 123, 125, 126, 124, 126
+        ]
+
+        facilityName = "Xưởng sản xuất số 1"
+        meterName = "Đồng hồ điện tổng"
+        operationalContext = (
+            "Máy nén khí gần đây vẫn chạy trong giờ nghỉ trưa. "
+            + "Ngày tiêu thụ tăng mạnh có bảo trì dây chuyền và nhiệt độ khu vực cao."
+        )
+        desiredOutcome = (
+            "Xác định nguyên nhân làm điện năng tăng và đề xuất thứ tự xử lý "
+            + "để giảm tối thiểu 8% tiêu thụ mà không ảnh hưởng sản lượng."
+        )
+        measurements = consumptions.indices.compactMap { index in
+            guard let date = calendar.date(
+                byAdding: .day,
+                value: index - (consumptions.count - 1),
+                to: today
+            ) else { return nil }
+            return EnergyMeasurementDraft(
+                date: date,
+                consumptionKWh: String(consumptions[index]),
+                productionUnits: String(productions[index]),
+                operatingHours: index == 12 ? "11" : "8"
+            )
+        }
+        result = nil
+        errorMessage = nil
+        savedDatasetAwaitingAI = nil
+        savedPointsAwaitingAI = []
+        uploadState = .idle
+    }
+
     func removeMeasurement(id: UUID) {
         guard measurements.count > 7 else {
             errorMessage = "Giữ tối thiểu 7 dòng để AI có đủ dữ liệu phân tích."
@@ -247,6 +289,16 @@ final class DataInputViewModel: ObservableObject {
                 return "Dữ liệu đã được lưu an toàn. Gemini đang phản hồi chậm; hãy thử phân tích AI lại."
             }
             return "Dữ liệu đã được lưu an toàn nhưng AI chưa tạo được phân tích. Hãy thử lại, hệ thống sẽ không lưu trùng dữ liệu."
+        }
+        if let urlError = error as? URLError {
+            switch urlError.code {
+            case .cannotConnectToHost, .networkConnectionLost, .notConnectedToInternet:
+                return "Không kết nối được EcoMetric API. Hãy kiểm tra server đang chạy rồi thử lại."
+            case .timedOut:
+                return "Máy chủ phản hồi chậm. Hãy thử lại sau ít phút."
+            default:
+                break
+            }
         }
         return error.localizedDescription
     }

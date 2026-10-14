@@ -39,6 +39,9 @@ struct RootTabView: View {
             DataInputView(
                 onOpenAI: {
                     selectedTab = .ai
+                },
+                onOpenReports: {
+                    selectedTab = .reports
                 }
             )
             .tag(AppTab.data)

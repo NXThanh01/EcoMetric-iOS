@@ -239,6 +239,21 @@ struct EcoMetricTests {
 
     @Test
     @MainActor
+    func dienNhanhBoDuLieuBatThuongChoBanTrinhDien() throws {
+        let viewModel = DataInputViewModel()
+
+        viewModel.loadDemoAnomalyData()
+        let points = try viewModel.makePoints()
+
+        #expect(viewModel.facilityName == "Xưởng sản xuất số 1")
+        #expect(points.count == 14)
+        #expect(points.map(\.consumptionKWh).max() == 1_820)
+        #expect(viewModel.operationalContext.contains("Máy nén khí"))
+        #expect(!viewModel.desiredOutcome.isEmpty)
+    }
+
+    @Test
+    @MainActor
     func tuChoiHaiDiemDoTrungNgay() throws {
         let viewModel = DataInputViewModel()
         for index in viewModel.measurements.indices {

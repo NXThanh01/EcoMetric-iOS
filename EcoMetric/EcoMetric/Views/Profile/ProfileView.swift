@@ -23,7 +23,7 @@ struct ProfileView: View {
                     logoutButton
                 }
                 .padding(16)
-                .padding(.bottom, 24)
+                .padding(.bottom, 110)
             }
             .background(EcoTheme.background.ignoresSafeArea())
             .navigationTitle("Tài khoản")

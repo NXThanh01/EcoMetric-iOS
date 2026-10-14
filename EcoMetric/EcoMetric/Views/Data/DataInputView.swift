@@ -9,6 +9,7 @@ import SwiftUI
 
 struct DataInputView: View {
     let onOpenAI: () -> Void
+    let onOpenReports: () -> Void
 
     @StateObject private var viewModel = DataInputViewModel()
     @EnvironmentObject private var analysisStore: AppAnalysisStore
@@ -36,7 +37,7 @@ struct DataInputView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 14)
-                .padding(.bottom, 32)
+                .padding(.bottom, 110)
             }
             .scrollDismissesKeyboard(.interactively)
             .background(EcoTheme.background.ignoresSafeArea())
@@ -134,6 +135,22 @@ struct DataInputView: View {
                     .background(EcoTheme.lightBlue)
                     .clipShape(Capsule())
             }
+
+            Button {
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    viewModel.loadDemoAnomalyData()
+                }
+            } label: {
+                Label("Điền nhanh bộ dữ liệu bất thường", systemImage: "wand.and.stars")
+                    .font(.subheadline.bold())
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 11)
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(EcoTheme.darkGreen)
+            .background(EcoTheme.lightGreen)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .accessibilityIdentifier("loadDemoDataButton")
 
             ForEach(Array(viewModel.measurements.indices), id: \.self) { index in
                 measurementRow(index: index)
@@ -492,8 +509,14 @@ struct DataInputView: View {
                 .buttonStyle(.bordered)
                 .tint(EcoTheme.green)
 
-                Button("Xem AI Insight") {
+                Button("AI Insight") {
                     onOpenAI()
+                }
+                .buttonStyle(.bordered)
+                .tint(EcoTheme.green)
+
+                Button("Mở báo cáo") {
+                    onOpenReports()
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(EcoTheme.green)

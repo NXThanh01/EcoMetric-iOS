@@ -74,6 +74,17 @@ flowchart TD
     I --> J[Reports]
 ```
 
+### Kịch bản quay demo nhanh
+
+1. Khởi động PostgreSQL và backend, sau đó mở ứng dụng trên iPhone Simulator.
+2. Tại **Tổng quan**, giới thiệu bốn luồng chính: nhập dữ liệu, AI phân tích, giải pháp và báo cáo.
+3. Vào **Dữ liệu**, chọn **Điền nhanh bộ dữ liệu bất thường** rồi nhấn **Lưu và phân tích bằng AI**. Bộ dữ liệu 14 ngày đã có một đỉnh tiêu thụ rõ ràng để kết quả luôn dễ quan sát khi trình diễn.
+4. Tại **AI**, đối chiếu phần `Engine tính toán` với phần `AI đề xuất`, xem nguyên nhân và hành động kiểm chứng.
+5. Mở **Báo cáo**, xem biểu đồ, đặt câu hỏi tiếp cho Cố vấn EcoMetric và xuất báo cáo PDF.
+
+> [!TIP]
+> Nên chạy trước một lượt để dữ liệu và AI Insight được lưu trong PostgreSQL. Khi quay lại, báo cáo vẫn có nội dung nếu kết nối Gemini tạm thời chậm.
+
 ## ✨ Tính năng
 
 | Module | Nội dung | Trạng thái |

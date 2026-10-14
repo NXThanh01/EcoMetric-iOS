@@ -34,7 +34,7 @@ struct ReportsView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 14)
-                .padding(.bottom, 32)
+                .padding(.bottom, 110)
             }
             .background(EcoTheme.background.ignoresSafeArea())
             .navigationTitle("Báo cáo")
@@ -413,7 +413,7 @@ struct ReportsView: View {
             }
 
             ForEach(advisor.messages) { message in
-                advisorMessage(message)
+                advisorMessage(message, result: result)
             }
 
             if let error = advisor.errorMessage {
@@ -474,7 +474,10 @@ struct ReportsView: View {
         .disabled(advisor.isSending)
     }
 
-    private func advisorMessage(_ message: AdvisorChatEntry) -> some View {
+    private func advisorMessage(
+        _ message: AdvisorChatEntry,
+        result: SavedEnergyAnalysis
+    ) -> some View {
         VStack(alignment: .leading, spacing: 9) {
             Text(message.sender == .user ? "BẠN" : "CỐ VẤN ECOMETRIC")
                 .font(.caption2.bold())
@@ -492,6 +495,18 @@ struct ReportsView: View {
             }
             if let metric = message.verificationMetric, !metric.isEmpty {
                 infoRow(icon: "scope", title: "KPI đo lại", value: metric)
+            }
+            if !message.followUpQuestions.isEmpty {
+                Text("HỎI TIẾP")
+                    .font(.caption2.bold())
+                    .foregroundStyle(EcoTheme.green)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 7) {
+                        ForEach(message.followUpQuestions, id: \.self) { question in
+                            advisorPrompt(question, result: result)
+                        }
+                    }
+                }
             }
         }
         .padding(12)

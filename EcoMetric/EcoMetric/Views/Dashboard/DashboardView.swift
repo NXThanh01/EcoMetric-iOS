@@ -15,6 +15,7 @@ struct DashboardView: View {
     let onOpenReports: () -> Void
 
     @State private var appeared = false
+    @State private var showNotifications = false
     @StateObject private var viewModel: DashboardViewModel
 
     // MARK: - Tình huống năng lượng demo
@@ -96,7 +97,9 @@ struct DashboardView: View {
                                 )
                             }
                         }
-                        .padding()
+                        .padding(.horizontal, 16)
+                        .padding(.top, 16)
+                        .padding(.bottom, 110)
                         .opacity(
                             appeared ? 1 : 0
                         )
@@ -120,6 +123,11 @@ struct DashboardView: View {
             }
             .task {
                 await viewModel.load()
+            }
+            .alert("Trung tâm cảnh báo", isPresented: $showNotifications) {
+                Button("Đã hiểu", role: .cancel) {}
+            } message: {
+                Text("Hiện không có cảnh báo khẩn cấp mới. Các kỳ bất thường sẽ xuất hiện trong AI Insight và Báo cáo.")
             }
         }
     }
@@ -146,9 +154,7 @@ private extension DashboardView {
                 Spacer()
 
                 Button {
-
-                    // Thông báo minh họa
-
+                    showNotifications = true
                 } label: {
 
                     ZStack {
@@ -216,15 +222,11 @@ private extension DashboardView {
                         "info.circle.fill"
                 )
 
-                Text(
-                    "Dữ liệu minh họa"
-                )
+                Text("Bản trình diễn")
 
                 Text("•")
 
-                Text(
-                    "MVP"
-                )
+                Text("Engine + Gemini")
                 .fontWeight(.bold)
             }
             .font(.caption)
@@ -263,23 +265,19 @@ private extension DashboardView {
 
                 Spacer()
 
-                Text(
-                    "Tất cả công cụ"
-                )
-                .font(.caption)
-                .foregroundStyle(
-                    EcoTheme.blue
-                )
+                Text("4 luồng chính")
+                    .font(.caption.bold())
+                    .foregroundStyle(EcoTheme.darkGreen)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 5)
+                    .background(EcoTheme.lightGreen)
+                    .clipShape(Capsule())
             }
 
-            ScrollView(
-                .horizontal,
-                showsIndicators: false
+            LazyVGrid(
+                columns: [GridItem(.flexible()), GridItem(.flexible())],
+                spacing: 12
             ) {
-
-                HStack(
-                    spacing: 12
-                ) {
 
                     quickFeatureCard(
                         icon:
@@ -313,22 +311,9 @@ private extension DashboardView {
                         title:
                             "Giải pháp",
                         subtitle:
-                            "Solution Card",
+                            "Kế hoạch hành động",
                         color:
                             .orange
-                    ) {
-                        onOpenAI()
-                    }
-
-                    quickFeatureCard(
-                        icon:
-                            "checklist",
-                        title:
-                            "Action Plan",
-                        subtitle:
-                            "Triển khai",
-                        color:
-                            EcoTheme.green
                     ) {
                         onOpenAI()
                     }
@@ -339,13 +324,12 @@ private extension DashboardView {
                         title:
                             "Báo cáo",
                         subtitle:
-                            "ESG / Carbon",
+                            "PDF & Cố vấn AI",
                         color:
                             EcoTheme.blue
                     ) {
                         onOpenReports()
                     }
-                }
             }
         }
     }
@@ -409,10 +393,7 @@ private extension DashboardView {
                         )
                 }
             }
-            .frame(
-                width: 118,
-                alignment: .leading
-            )
+            .frame(maxWidth: .infinity, minHeight: 118, alignment: .leading)
             .padding()
             .background(
                 Color.white

@@ -26,7 +26,7 @@ struct AIWorkspaceView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 14)
-                .padding(.bottom, 32)
+                .padding(.bottom, 110)
             }
             .background(EcoTheme.background.ignoresSafeArea())
             .navigationTitle("AI Insight")
