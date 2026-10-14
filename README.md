@@ -171,6 +171,8 @@ Email đăng ký phải được xác minh bằng OTP 6 số. Mã có hiệu l�
 
 Khi quản lý tạo nhân viên, EcoMetric gửi email gồm tên doanh nghiệp, vai trò, email đăng nhập và mật khẩu tạm. Mật khẩu này hết hạn sau 24 giờ; nhân viên bắt buộc đổi mật khẩu ngay lần đăng nhập đầu tiên.
 
+Nếu nhân viên chưa nhận được thư, quản lý có thể chọn **Gửi lại thư** ngay trên thẻ thành viên. Hệ thống thu hồi phiên cũ, tạo mật khẩu tạm mới và vô hiệu hóa mật khẩu tạm trước đó. API chỉ xác nhận thành công sau khi SMTP đã chấp nhận thư.
+
 ### Luồng AI Insight từ dữ liệu thật
 
 ```mermaid
@@ -332,6 +334,7 @@ Backend mặc định chạy tại `http://127.0.0.1:8000`:
 - Đổi mật khẩu tạm: `POST /v1/auth/change-password`
 - Thông tin tài khoản: `GET /v1/auth/me`
 - Quản lý nhân viên: `GET/POST/PATCH /v1/organization/members`
+- Gửi lại thư mời và cấp mật khẩu tạm mới: `POST /v1/organization/members/{id}/resend-invitation`
 - Tạo cơ sở: `POST /v1/facilities`
 - Lưu dữ liệu điện thật: `POST /v1/datasets/electricity`
 - Phân tích định lượng: `POST /v1/datasets/{id}/analyze`

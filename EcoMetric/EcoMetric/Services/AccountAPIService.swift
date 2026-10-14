@@ -120,6 +120,16 @@ struct AccountAPIService {
         )
     }
 
+    func resendMemberInvitation(id: UUID, token: String) async throws -> AppUser {
+        try await send(
+            path: "v1/organization/members/\(id.uuidString)/resend-invitation",
+            method: "POST",
+            body: nil,
+            token: token,
+            responseType: AppUser.self
+        )
+    }
+
     private func send<Payload: Encodable, Response: Decodable>(
         path: String,
         method: String,

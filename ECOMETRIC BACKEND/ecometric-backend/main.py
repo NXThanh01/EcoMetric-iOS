@@ -82,6 +82,7 @@ from services.auth_service import (
     login,
     logout,
     request_registration_otp,
+    resend_member_invitation,
     update_member,
 )
 from services.email_service import EmailDeliveryError
@@ -97,7 +98,7 @@ app = FastAPI(
         "Time-series anomaly detection, knowledge retrieval, scoring, "
         "and calculation engine for EcoMetric."
     ),
-    version="1.3.1",
+    version="1.3.2",
     docs_url=None if is_production else "/docs",
     redoc_url=None if is_production else "/redoc",
     openapi_url=None if is_production else "/openapi.json",
@@ -283,6 +284,27 @@ def add_organization_member(
 ) -> UserResponse:
     try:
         return create_member(db, user, data)
+    except AuthorizationError as error:
+        raise HTTPException(status_code=403, detail=str(error)) from error
+    except AccountConflictError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
+    except EmailDeliveryError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+
+
+@app.post(
+    "/v1/organization/members/{member_id}/resend-invitation",
+    response_model=UserResponse,
+)
+def resend_organization_member_invitation(
+    member_id: uuid.UUID,
+    user: User = Depends(ready_user),
+    db: Session = Depends(get_db),
+) -> UserResponse:
+    try:
+        return resend_member_invitation(db, user, member_id)
+    except AuthenticationError as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
     except AuthorizationError as error:
         raise HTTPException(status_code=403, detail=str(error)) from error
     except AccountConflictError as error:

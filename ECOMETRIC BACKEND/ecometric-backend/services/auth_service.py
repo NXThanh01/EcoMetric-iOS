@@ -398,6 +398,59 @@ def create_member(
     return user
 
 
+def resend_member_invitation(
+    session: Session,
+    actor: User,
+    member_id: uuid.UUID,
+    settings: Optional[Settings] = None,
+    deliver: Optional[Callable[..., None]] = None,
+) -> User:
+    require_manager(actor)
+    target = session.get(User, member_id)
+    if target is None or target.organization_id != actor.organization_id:
+        raise AuthenticationError("Không tìm thấy thành viên")
+    if target.role == "owner":
+        raise AuthorizationError("Không thể gửi lại thư mời cho chủ sở hữu")
+    if actor.role == "admin" and target.role == "admin":
+        raise AuthorizationError("Admin không thể quản lý admin khác")
+    if not target.is_active:
+        raise AccountConflictError(
+            "Hãy kích hoạt tài khoản trước khi gửi lại thư mời"
+        )
+
+    temporary_password = f"Eco{secrets.token_urlsafe(9)}Aa1"
+    previous_hash = target.password_hash
+    previous_must_change = target.must_change_password
+    previous_expiry = target.temporary_password_expires_at
+    target.password_hash = hash_password(temporary_password)
+    target.must_change_password = True
+    target.temporary_password_expires_at = (
+        datetime.now(timezone.utc) + timedelta(hours=TEMPORARY_PASSWORD_HOURS)
+    )
+    session.query(AuthSession).filter(AuthSession.user_id == target.id).delete()
+
+    settings = settings or get_settings()
+    delivery = deliver or send_member_invitation
+    try:
+        delivery(
+            settings,
+            target.email,
+            target.full_name,
+            actor.organization.name,
+            target.role,
+            temporary_password,
+        )
+        session.commit()
+    except Exception:
+        session.rollback()
+        target.password_hash = previous_hash
+        target.must_change_password = previous_must_change
+        target.temporary_password_expires_at = previous_expiry
+        raise
+    session.refresh(target)
+    return target
+
+
 def change_password(
     session: Session,
     user: User,

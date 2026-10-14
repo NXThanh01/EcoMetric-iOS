@@ -98,9 +98,21 @@ struct MemberManagementView: View {
             }
 
             if member.mustChangePassword {
-                Label("Chờ đổi mật khẩu tạm", systemImage: "clock.badge.exclamationmark")
-                    .font(.caption.bold())
-                    .foregroundStyle(.orange)
+                HStack {
+                    Label("Chờ đổi mật khẩu tạm", systemImage: "clock.badge.exclamationmark")
+                        .font(.caption.bold())
+                        .foregroundStyle(.orange)
+                    Spacer()
+                    if canEdit(member) {
+                        Button {
+                            Task { await session.resendInvitation(to: member) }
+                        } label: {
+                            Label("Gửi lại thư", systemImage: "paperplane.fill")
+                                .font(.caption.bold())
+                        }
+                        .disabled(session.isWorking)
+                    }
+                }
             }
 
             if canEdit(member) {
@@ -161,6 +173,13 @@ private struct AddMemberView: View {
     var body: some View {
         NavigationStack {
             Form {
+                if let error = session.errorMessage {
+                    Section {
+                        Label(error, systemImage: "exclamationmark.triangle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    }
+                }
                 Section("Thông tin nhân viên") {
                     TextField("Họ tên", text: $name)
                     TextField("Email", text: $email)
@@ -194,7 +213,7 @@ private struct AddMemberView: View {
                     Button("Hủy") { isPresented = false }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Tạo") {
+                    Button {
                         Task {
                             let created = await session.createMember(
                                 name: name,
@@ -204,10 +223,22 @@ private struct AddMemberView: View {
                             )
                             if created { isPresented = false }
                         }
+                    } label: {
+                        if session.isWorking {
+                            ProgressView()
+                        } else {
+                            Text("Tạo & gửi email")
+                        }
                     }
-                    .disabled(name.count < 2 || !email.contains("@") || password.count < 8)
+                    .disabled(
+                        name.trimmingCharacters(in: .whitespacesAndNewlines).count < 2
+                            || !email.contains("@")
+                            || password.count < 8
+                            || session.isWorking
+                    )
                 }
             }
+            .interactiveDismissDisabled(session.isWorking)
         }
     }
 }

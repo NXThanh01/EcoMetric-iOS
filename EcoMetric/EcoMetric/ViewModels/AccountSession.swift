@@ -173,6 +173,21 @@ final class AccountSession: ObservableObject {
         }
     }
 
+    func resendInvitation(to member: AppUser) async {
+        guard let token else { return }
+        isWorking = true
+        errorMessage = nil
+        noticeMessage = nil
+        defer { isWorking = false }
+        do {
+            _ = try await service.resendMemberInvitation(id: member.id, token: token)
+            members = try await service.members(token: token)
+            noticeMessage = "Đã gửi mật khẩu tạm mới tới \(member.email)."
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     private func authenticate(
         operation: () async throws -> AuthenticationResponse
     ) async {

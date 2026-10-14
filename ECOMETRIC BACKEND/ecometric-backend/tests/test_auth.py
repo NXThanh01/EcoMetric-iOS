@@ -30,6 +30,7 @@ from services.auth_service import (  # noqa: E402
     get_user_by_token,
     login,
     request_registration_otp,
+    resend_member_invitation,
     update_member,
 )
 from settings import Settings  # noqa: E402
@@ -278,6 +279,50 @@ class AuthenticationTests(unittest.TestCase):
             )
 
             self.assertFalse(logged_in.user.must_change_password)
+
+    def test_owner_can_resend_invitation_with_new_temporary_password(self):
+        with self.session_factory() as session:
+            auth = self._create_owner(session)
+            owner = get_user_by_token(session, auth.access_token)
+            employee = create_member(
+                session,
+                owner,
+                MemberCreate(
+                    email="employee@example.com",
+                    full_name="Nhân viên A",
+                    password="NhanVien123",
+                    role="member",
+                ),
+                deliver=lambda *_args: None,
+            )
+            delivered_passwords = []
+
+            updated = resend_member_invitation(
+                session,
+                owner,
+                employee.id,
+                deliver=lambda *_args: delivered_passwords.append(_args[-1]),
+            )
+
+            self.assertTrue(updated.must_change_password)
+            self.assertEqual(len(delivered_passwords), 1)
+            self.assertGreaterEqual(len(delivered_passwords[0]), 8)
+            with self.assertRaises(AuthenticationError):
+                login(
+                    session,
+                    LoginRequest(
+                        email="employee@example.com",
+                        password="NhanVien123",
+                    ),
+                )
+            logged_in = login(
+                session,
+                LoginRequest(
+                    email="employee@example.com",
+                    password=delivered_passwords[0],
+                ),
+            )
+            self.assertTrue(logged_in.user.must_change_password)
 
     def test_changing_password_revokes_other_sessions(self):
         with self.session_factory() as session:
