@@ -13,7 +13,7 @@ private struct FacilityCreateRequest: Encodable {
 }
 
 struct OperationalDataAPIService {
-    private let baseURL: URL
+    private let baseURL: URL?
     private let session: URLSession
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
@@ -22,13 +22,7 @@ struct OperationalDataAPIService {
         baseURL: URL? = nil,
         session: URLSession = .shared
     ) {
-        let configuredURL = ProcessInfo.processInfo.environment[
-            "ECOMETRIC_API_BASE_URL"
-        ].flatMap(URL.init(string:))
-
-        self.baseURL = baseURL
-            ?? configuredURL
-            ?? URL(string: "http://127.0.0.1:8000")!
+        self.baseURL = APIConfiguration.baseURL(override: baseURL)
         self.session = session
     }
 
@@ -127,7 +121,7 @@ struct OperationalDataAPIService {
         try await send(
             path: "v1/datasets/\(datasetID.uuidString)/ai-insight",
             method: "POST",
-            timeoutInterval: 120,
+            timeoutInterval: APIConfiguration.aiTimeout,
             responseType: GeminiDatasetInsightResponse.self
         )
     }
@@ -144,13 +138,14 @@ struct OperationalDataAPIService {
                 question: question,
                 history: Array(history.suffix(8))
             ),
-            timeoutInterval: 120,
+            timeoutInterval: APIConfiguration.aiTimeout,
             responseType: DatasetAdvisorResponse.self
         )
     }
 
-    private func makeURL(path: String) -> URL {
-        path.split(separator: "/").reduce(baseURL) { url, component in
+    private func makeURL(path: String) throws -> URL {
+        guard let baseURL else { throw AIRecommendationAPIError.invalidBaseURL }
+        return path.split(separator: "/").reduce(baseURL) { url, component in
             url.appendingPathComponent(String(component))
         }
     }
@@ -158,7 +153,7 @@ struct OperationalDataAPIService {
     private func send<Response: Decodable>(
         path: String,
         method: String,
-        timeoutInterval: TimeInterval = 25,
+        timeoutInterval: TimeInterval = APIConfiguration.requestTimeout,
         responseType: Response.Type
     ) async throws -> Response {
         try await send(
@@ -174,7 +169,7 @@ struct OperationalDataAPIService {
         path: String,
         method: String,
         payload: Payload,
-        timeoutInterval: TimeInterval = 25,
+        timeoutInterval: TimeInterval = APIConfiguration.requestTimeout,
         responseType: Response.Type
     ) async throws -> Response {
         try await send(
@@ -193,7 +188,7 @@ struct OperationalDataAPIService {
         timeoutInterval: TimeInterval,
         responseType: Response.Type
     ) async throws -> Response {
-        var request = URLRequest(url: makeURL(path: path))
+        var request = URLRequest(url: try makeURL(path: path))
         request.httpMethod = method
         request.timeoutInterval = timeoutInterval
         request.setValue(

@@ -6,6 +6,8 @@
 
 EcoMetric là nền tảng iOS hỗ trợ doanh nghiệp theo dõi dữ liệu vận hành, nhận diện cơ hội tiết kiệm năng lượng và chuyển insight thành kế hoạch hành động. Số liệu được tính bằng engine xác định; Gemini phân tích ngữ cảnh, nêu giả thuyết và đề xuất giải pháp có thể kiểm chứng.
 
+**MVP API 1.4.2 · Rà soát kết nối ngày 15/10/2026.** Mã nguồn hiện bao gồm iOS và backend; các API dưới đây không phải hợp đồng API dashboard riêng của web.
+
 ![Swift](https://img.shields.io/badge/Swift-5.0-F05138?logo=swift&logoColor=white)
 ![SwiftUI](https://img.shields.io/badge/UI-SwiftUI-0D96F6?logo=swift&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi&logoColor=white)
@@ -26,14 +28,16 @@ EcoMetric hướng tới một vòng lặp cải tiến liên tục cho hoạt �
 
 > **Measure → Insight → Decide → Act → Remeasure**
 
-Ứng dụng giúp doanh nghiệp:
+MVP hiện hỗ trợ doanh nghiệp:
 
-- tập trung dữ liệu điện, nước, nhiên liệu và nguyên liệu;
-- theo dõi phát thải CO₂e, chi phí vận hành và xu hướng bất thường;
-- lượng hóa tiềm năng tiết kiệm điện và chi phí;
-- nhận giải pháp dựa trên knowledge base có nguồn tham chiếu;
-- xây dựng action plan và đo lại hiệu quả sau triển khai;
-- chuẩn bị dữ liệu cho ESG và Carbon Reporting.
+- nhập số đo điện, sản lượng, giờ vận hành và bối cảnh thực tế;
+- theo dõi tiêu thụ, đường cơ sở và kỳ bất thường;
+- nhận giả thuyết, giải pháp và hỏi đáp AI theo đúng dataset;
+- giao việc, theo dõi KPI và so sánh trước/sau;
+- tính tiền tiết kiệm và hoàn vốn khi nhập giá điện/chi phí đầu tư;
+- tính CO₂e khi cung cấp hệ số kèm nguồn, xem lịch sử và xuất báo cáo năng lượng PDF.
+
+OCR, nhập file thực tế, nước/nhiên liệu/nguyên liệu, kiểm kê Scope 1–2–3 và báo cáo ESG đầy đủ thuộc lộ trình mở rộng; không phải khả năng đã hoàn thiện của MVP.
 
 > [!IMPORTANT]
 > EcoMetric hiện là **MVP đang phát triển**. Luồng đăng ký doanh nghiệp, phân quyền nhân viên, nhập dữ liệu điện, lưu PostgreSQL, phát hiện bất thường, AI phân tích và xuất báo cáo năng lượng PDF đã hoạt động. Dashboard dùng dataset thực; báo cáo AI và công việc được lưu trên server. So sánh trước/sau chuẩn hóa theo dữ liệu vận hành. CO₂e chỉ được tính khi nhập hệ số kèm nguồn/năm; người dùng cần xác minh phạm vi áp dụng của nguồn này.
@@ -107,7 +111,7 @@ flowchart TD
 
 ## 🏗️ Kiến trúc hệ thống
 
-### Bản local 1.4.0 — chuẩn bị kiểm thử ngày 15/10/2026
+### Bản local 1.4.2 — quy trình kiểm thử
 
 1. Trong thư mục backend, chạy `venv/bin/alembic upgrade head` rồi `venv/bin/python run.py`.
 2. Nhập hai bộ dữ liệu cùng cơ sở và cùng tên đồng hồ: tối thiểu 7 ngày trước triển khai và 7 ngày sau, không chồng lấn ngày.
@@ -215,9 +219,9 @@ sequenceDiagram
     Gemini-->>App: Bằng chứng + hành động + KPI đo lại
 ```
 
-## 🧮 Use case đang hoạt động
+## 🧮 Ví dụ Engine chiếu sáng
 
-MVP hiện triển khai bài toán thay đèn công suất cao bằng LED tại **Xưởng 1**.
+Luồng chính của MVP phân tích dataset điện thực tế. Bảng sau là ví dụ riêng của Engine chiếu sáng: thay đèn công suất cao bằng LED tại **Xưởng 1**, không phải số liệu mặc định trên dashboard.
 
 | Thông số | Giá trị demo |
 |---|---:|
@@ -305,7 +309,7 @@ cd "ECOMETRIC BACKEND/ecometric-backend"
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-cp .env.example .env
+test -f .env || cp .env.example .env
 ```
 
 Mở `.env` và điền thông tin PostgreSQL cùng Gemini API key. Không commit file này:
@@ -341,6 +345,8 @@ Tạo cấu trúc database và chạy API:
 
 Backend mặc định chạy tại `http://127.0.0.1:8000`:
 
+Nếu máy đã có môi trường `venv/`, dùng `venv/bin/python` và `venv/bin/alembic` tương ứng; không cần tạo lại môi trường chỉ vì tên thư mục khác `.venv/`. Không ghi đè file `.env` đang chứa cấu hình local.
+
 - Health check: `GET /health`
 - Gửi OTP đăng ký: `POST /v1/auth/registration-otp`
 - Đăng ký công ty: `POST /v1/auth/register-company`
@@ -351,9 +357,14 @@ Backend mặc định chạy tại `http://127.0.0.1:8000`:
 - Gửi lại thư mời và cấp mật khẩu tạm mới: `POST /v1/organization/members/{id}/resend-invitation`
 - Tạo cơ sở: `POST /v1/facilities`
 - Lưu dữ liệu điện thật: `POST /v1/datasets/electricity`
+- Lịch sử dataset (100 gần nhất): `GET /v1/datasets`
+- Số đo của dataset: `GET /v1/datasets/{id}/measurements`
+- Mở AI đã lưu: `GET /v1/datasets/{id}/ai-insight`
 - Phân tích định lượng: `POST /v1/datasets/{id}/analyze`
 - Gemini AI Insight: `POST /v1/datasets/{id}/ai-insight`
 - Cố vấn theo báo cáo: `POST /v1/datasets/{id}/advisor`
+- Công việc: `GET/POST /v1/datasets/{id}/actions`, `PATCH /v1/actions/{id}`
+- So sánh trước/sau: `POST /v1/datasets/{id}/impact`
 - Knowledge sample: `GET /knowledge/led`
 - Opportunity detection: `POST /analyze`
 - Time-series anomaly detection: `POST /analyze/time-series`
@@ -384,6 +395,54 @@ ECOMETRIC_API_BASE_URL=http://<backend-host>:8000
 > [!NOTE]
 > Khi chạy trên thiết bị iPhone thật, `127.0.0.1` trỏ tới chính điện thoại. Hãy dùng địa chỉ LAN của máy Mac chạy backend và bảo đảm hai thiết bị cùng mạng.
 
+### Host, port và cách cấu hình iPhone thật
+
+| Trường hợp | Backend bind | URL app gọi |
+|---|---|---|
+| Simulator trên cùng Mac | `127.0.0.1:8000` | `http://127.0.0.1:8000` (mặc định) |
+| iPhone thật cùng Wi-Fi | `0.0.0.0:8000` | `http://IP_LAN_CUA_MAC:8000` |
+| Máy chủ triển khai | Qua reverse proxy | `https://TEN_MIEN_API` |
+
+`0.0.0.0` chỉ dùng để server lắng nghe, không phải địa chỉ nhập vào app. Cổng PostgreSQL `5432` là kết nối nội bộ backend → database, không phải cổng app gọi. HTTP local chỉ phục vụ phát triển trong mạng tin cậy; triển khai thật dùng HTTPS.
+
+Chạy backend cho thiết bị thật:
+
+```bash
+venv/bin/python run.py --host 0.0.0.0 --port 8000
+```
+
+Tìm IP bằng **System Settings → Network → Wi-Fi → Details → TCP/IP** trên Mac. Trong Xcode, **Product → Scheme → Edit Scheme → Run → Arguments → Environment Variables**, thêm `ECOMETRIC_API_BASE_URL=http://IP_LAN_CUA_MAC:8000`. Trên iPhone, mở URL đó với đuôi `/health` trong Safari để kiểm tra đường mạng; cho phép Local Network khi app hỏi. Nếu bị chặn, kiểm tra Wi-Fi client isolation và macOS Firewall.
+
+Để URL đi theo bản build/Archive thay vì chỉ lúc Run từ Xcode, thêm **User-Defined Build Setting** tên `ECOMETRIC_API_BASE_URL` tại target EcoMetric, đặt URL theo từng cấu hình Debug/Release. `Configuration/Info.plist` nhận giá trị này. Không đặt API key hoặc mật khẩu vào build setting.
+
+Ba service iOS dùng chung `Services/APIConfiguration.swift`. Thứ tự ưu tiên: URL truyền khi khởi tạo (kiểm thử) → environment variable → Info.plist → loopback chỉ trên Simulator. Thiết bị thật thiếu cấu hình hoặc cấu hình sai sẽ báo lỗi; không tự gọi nhầm loopback. Request thường chờ 25 giây; phân tích/chat AI chờ 120 giây. App khai báo Local Network và ngoại lệ ATS local, không mở `NSAllowsArbitraryLoads` toàn cục. Xem [Local Network của Apple](https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy).
+
+### Kiểm tra và xử lý lỗi kết nối
+
+```bash
+brew services start postgresql@17
+pg_isready -h 127.0.0.1 -p 5432
+curl --fail-with-body http://127.0.0.1:8000/health
+lsof -nP -iTCP:8000 -sTCP:LISTEN
+```
+
+- `/health`: HTTP 200 với `status=ok`, `database=ok`; database hỏng trả HTTP 503 và `status=degraded`.
+- `gemini=configured` chỉ xác nhận có cấu hình; muốn biết AI hoạt động phải thực hiện một phân tích/chat thật.
+- `401/403` ở `/v1/*`: kiểm tra đăng nhập, quyền và yêu cầu đổi mật khẩu tạm; không phải lỗi cổng.
+- `404` ở `/api/dashboard`: route này chưa có trong backend iOS; đối chiếu `/docs` trước khi nối web.
+- `503` ở AI: đọc thông báo quota/quá tải/cấu hình. Dữ liệu và báo cáo Engine vẫn được giữ; dùng nút thử lại, không nhập trùng dataset.
+- Cổng 8000 đã bị chiếm: xác định tiến trình bằng `lsof`, không tự đổi cổng mà quên cập nhật URL app.
+
+Backend đã có smoke test HTTP (`scripts/smoke_test.py`), test health khi mất DB, quyền/cách ly doanh nghiệp và test cấu hình URL iOS. Simulator được kiểm thử; kết nối trên iPhone thật/Wi-Fi và bản HTTPS triển khai cần xác minh tại môi trường đó.
+
+### Kết quả rà soát MVP ngày 15/10/2026
+
+- 49 test backend qua: gồm xác thực/phân quyền, cách ly doanh nghiệp, dữ liệu, AI fallback và health/port.
+- Smoke test HTTP thật tại `127.0.0.1:8000` qua: health/database, recommendation, time-series và OpenAPI; `/v1/datasets` thiếu token trả 401.
+- Kiểm thử AI thật bằng bộ dữ liệu tổng hợp: 2 giải pháp trong khoảng 4,2 giây; chatbot trả lời kèm 3 bằng chứng. Đây là kết quả tại thời điểm kiểm tra, không phải cam kết độ trễ.
+- Test iOS gồm cấu hình URL, nhập liệu, PDF và mở các tab. Lượt đầu 16 test qua; lượt chạy lại có một timeout của test khởi động Simulator, các test còn lại qua. Bài test khởi động đã chạy lại riêng trên iPhone 17 Pro và qua. Chi tiết xác minh được lưu trong kết quả Xcode của lượt chạy local.
+- Runtime local hiện dùng Python 3.9 và phát cảnh báo hết vòng đời từ SDK; khi triển khai nên tạo môi trường Python 3.12+ và chạy lại bộ test. Chưa xác minh iPhone thật, TestFlight hay HTTPS production.
+
 ## 🔌 API example
 
 <details open>
@@ -394,7 +453,7 @@ Endpoint đọc dữ liệu đã lưu trong PostgreSQL, chạy Time-series Engin
 ```json
 {
   "provider": "gemini",
-  "model": "gemini-3.8-flash",
+  "model": "gemini-3.5-flash-lite",
   "facility": "Xưởng 1",
   "quantitative_analysis": {
     "engine_version": "1.2.0",
@@ -537,16 +596,19 @@ flowchart LR
 - [x] Phân quyền chủ doanh nghiệp, admin và nhân viên theo email
 - [x] Gửi thư mời nhân viên và bắt buộc đổi mật khẩu tạm trong 24 giờ
 - [x] Tách dữ liệu PostgreSQL theo doanh nghiệp
+- [x] Lưu lịch sử báo cáo AI trên server, hiệu chỉnh số đo thành dataset mới
+- [x] Giao công việc theo thành viên, thời hạn và KPI; đo lại trên hai kỳ thực tế
+- [x] Cấu hình URL API tập trung, phân biệt Simulator/iPhone thật và health phản ánh đúng database
 - [ ] Quên mật khẩu và khôi phục tài khoản
 - [ ] Upload và xử lý file thực tế
 - [ ] Carbon calculation engine với emission factors đã xác thực
 - [ ] Mở rộng knowledge base cho nước, nhiên liệu và nguyên liệu
-- [ ] Multi-site monitoring và enterprise accounts
+- [ ] Giám sát nhiều cơ sở nâng cao và kiểm thử vận hành doanh nghiệp quy mô lớn
 - [ ] TestFlight và App Store release
 
 ## 🌍 English summary
 
-EcoMetric is an iOS sustainability MVP that transforms real operational measurements into explainable energy insights, verifiable action plans, and exportable A4 energy reports. The current end-to-end flow combines a SwiftUI client, FastAPI, PostgreSQL, deterministic time-series analysis, structured Gemini AI output, charts, and native PDF generation. Quantitative values are calculated by the backend; Gemini is used for grounded interpretation, hypotheses, and recommended verification steps. The dashboard remains partially simulated, while Carbon Reporting is intentionally deferred until verified emission factors are available.
+EcoMetric is an iOS energy MVP combining SwiftUI, FastAPI, PostgreSQL, deterministic calculations and structured AI interpretation. The dashboard and A4 PDF reports use real electricity datasets. Reports and tasks are persisted by organization; users can assign actions and compare measured periods. Cost and CO₂e calculations require user-supplied prices and referenced factors. Full carbon accounting, OCR, ESG reporting and additional resource types remain future work. API configuration distinguishes Simulator loopback from physical-device LAN/HTTPS addresses; readiness returns HTTP 503 if the database is unavailable.
 
 ## 🔒 Ownership and license
 

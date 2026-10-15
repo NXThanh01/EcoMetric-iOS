@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
@@ -100,7 +100,7 @@ app = FastAPI(
         "Time-series anomaly detection, knowledge retrieval, scoring, "
         "and calculation engine for EcoMetric."
     ),
-    version="1.4.1",
+    version="1.4.2",
     docs_url=None if is_production else "/docs",
     redoc_url=None if is_production else "/redoc",
     openapi_url=None if is_production else "/openapi.json",
@@ -160,16 +160,17 @@ def root():
 
 
 @app.get("/health")
-def health(db: Session = Depends(get_db)):
+def health(response: Response, db: Session = Depends(get_db)):
     settings = get_settings()
     database_status = "ok"
     try:
         db.execute(text("SELECT 1"))
     except SQLAlchemyError:
         database_status = "unavailable"
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
 
     return {
-        "status": "ok",
+        "status": "ok" if database_status == "ok" else "degraded",
         "database": database_status,
         "gemini": "configured" if settings.gemini_api_key else "not_configured",
         "gemini_model": settings.gemini_model,

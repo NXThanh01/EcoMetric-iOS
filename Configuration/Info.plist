@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+    </dict>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>EcoMetric cần kết nối máy chủ trong mạng nội bộ để lưu số đo, phân tích AI và tải báo cáo của doanh nghiệp.</string>
+    <key>ECOMETRIC_API_BASE_URL</key>
+    <string>$(ECOMETRIC_API_BASE_URL)</string>
+</dict>
+</plist>

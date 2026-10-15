@@ -22,6 +22,8 @@ class Base(DeclarativeBase):
 engine = create_engine(
     get_settings().database_url,
     pool_pre_ping=True,
+    connect_args={"connect_timeout": 5},
+    pool_timeout=10,
 )
 
 SessionLocal = sessionmaker(

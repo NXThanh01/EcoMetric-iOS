@@ -13,6 +13,22 @@ import Testing
 struct EcoMetricTests {
 
     @Test
+    func cauHinhAPIPhanBietSimulatorVaThietBiThat() {
+        #expect(APIConfiguration.resolveBaseURL(environment: [:], bundleValue: nil, isSimulator: true)?.absoluteString == "http://127.0.0.1:8000")
+        #expect(APIConfiguration.resolveBaseURL(environment: [:], bundleValue: nil, isSimulator: false) == nil)
+        #expect(APIConfiguration.resolveBaseURL(environment: ["ECOMETRIC_API_BASE_URL": "http://192.168.1.20:8001"], bundleValue: nil, isSimulator: false)?.port == 8001)
+        #expect(APIConfiguration.resolveBaseURL(environment: [:], bundleValue: "https://api.example.com", isSimulator: false)?.scheme == "https")
+    }
+
+    @Test
+    func cauHinhAPITuChoiDiaChiSaiVaKhongTuChuyenVeLocalhost() {
+        for value in ["0.0.0.0:8000", "http://0.0.0.0:8000", "ftp://example.com", "http://user:pass@example.com", "https://example.com?key=secret", "http://localhost:8000", "http://127.0.0.1:8000", "http://192.168.1.20:65536"] {
+            #expect(APIConfiguration.resolveBaseURL(environment: ["ECOMETRIC_API_BASE_URL": value], bundleValue: "https://api.example.com", isSimulator: false) == nil)
+        }
+        #expect(APIConfiguration.resolveBaseURL(environment: ["ECOMETRIC_API_BASE_URL": "https://env.example.com/v1"], bundleValue: "https://bundle.example.com", isSimulator: true)?.host == "env.example.com")
+    }
+
+    @Test
     @MainActor
     func giaiMaDanhSachKhuyenNghiTuAIEngine() throws {
         let json = #"""

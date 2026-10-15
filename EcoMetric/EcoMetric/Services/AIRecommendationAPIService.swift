@@ -15,7 +15,7 @@ enum AIRecommendationAPIError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidBaseURL:
-            return "Địa chỉ EcoMetric Engine không hợp lệ."
+            return "Địa chỉ máy chủ chưa được cấu hình đúng. Trên iPhone thật, hãy dùng IP mạng LAN của máy Mac hoặc địa chỉ HTTPS; không dùng 127.0.0.1 hay 0.0.0.0."
         case .invalidResponse:
             return "EcoMetric Engine trả về phản hồi không hợp lệ."
         case let .server(statusCode, message):
@@ -81,20 +81,14 @@ struct APIErrorResponse: Decodable {
 }
 
 struct AIRecommendationAPIService {
-    private let baseURL: URL
+    private let baseURL: URL?
     private let session: URLSession
 
     init(
         baseURL: URL? = nil,
         session: URLSession = .shared
     ) {
-        let configuredURL = ProcessInfo.processInfo.environment[
-            "ECOMETRIC_API_BASE_URL"
-        ].flatMap(URL.init(string:))
-
-        self.baseURL = baseURL
-            ?? configuredURL
-            ?? URL(string: "http://127.0.0.1:8000")!
+        self.baseURL = APIConfiguration.baseURL(override: baseURL)
         self.session = session
     }
 
@@ -145,14 +139,14 @@ struct AIRecommendationAPIService {
         payload: Payload,
         responseType: Response.Type
     ) async throws -> Response {
-        let url = baseURL.appendingPathComponent(path)
-        guard url.scheme != nil else {
+        guard let baseURL else {
             throw AIRecommendationAPIError.invalidBaseURL
         }
+        let url = path.split(separator: "/").reduce(baseURL) { $0.appendingPathComponent(String($1)) }
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.timeoutInterval = 15
+        request.timeoutInterval = APIConfiguration.requestTimeout
         request.setValue(
             "application/json",
             forHTTPHeaderField: "Content-Type"

@@ -1,18 +1,13 @@
 import Foundation
 
 struct AccountAPIService {
-    private let baseURL: URL
+    private let baseURL: URL?
     private let session: URLSession
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
 
     init(baseURL: URL? = nil, session: URLSession = .shared) {
-        let configuredURL = ProcessInfo.processInfo.environment[
-            "ECOMETRIC_API_BASE_URL"
-        ].flatMap(URL.init(string:))
-        self.baseURL = baseURL
-            ?? configuredURL
-            ?? URL(string: "http://127.0.0.1:8000")!
+        self.baseURL = APIConfiguration.baseURL(override: baseURL)
         self.session = session
     }
 
@@ -153,13 +148,14 @@ struct AccountAPIService {
         token: String?,
         responseType: Response.Type
     ) async throws -> Response {
+        guard let baseURL else { throw AIRecommendationAPIError.invalidBaseURL }
         let url = path.split(separator: "/").reduce(baseURL) {
             $0.appendingPathComponent(String($1))
         }
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.httpBody = body
-        request.timeoutInterval = 25
+        request.timeoutInterval = APIConfiguration.requestTimeout
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         if let token {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")

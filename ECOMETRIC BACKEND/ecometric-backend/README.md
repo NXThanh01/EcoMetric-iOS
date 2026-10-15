@@ -2,6 +2,8 @@
 
 Backend dữ liệu và AI cho EcoMetric, cung cấp xác thực doanh nghiệp, phân quyền thành viên, lưu trữ số đo thực tế, phân tích chuỗi thời gian, phát hiện bất thường, Gemini AI Insight và xếp hạng giải pháp tiết kiệm năng lượng.
 
+Phiên bản API **1.4.2**, rà soát host/port ngày **15/10/2026**. [README gốc](../../README.md#host-port-và-cách-cấu-hình-iphone-thật) mô tả đầy đủ cấu hình Simulator, iPhone thật, Wi-Fi và Archive.
+
 > Các con số năng lượng và tài chính được tạo bởi engine xác định, không do mô hình ngôn ngữ tự sinh. Gemini chỉ diễn giải dữ kiện đã kiểm tra, nêu giả thuyết, đề xuất hành động và chỉ số cần đo lại.
 
 ## Kiến trúc AI hiện tại
@@ -25,17 +27,20 @@ Luồng này giữ số liệu định lượng có thể kiểm chứng ở bac
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-python run.py --reload
 ```
 
-API mặc định chạy tại `http://127.0.0.1:8000`. Tài liệu tương tác có tại `/docs`.
+Sau khi điền `.env`, bật PostgreSQL và chạy migration ở phần dưới, dùng `python run.py --host 127.0.0.1 --port 8000 --reload`. Nếu máy đã có `venv/`, dùng môi trường đó thay vì tạo lại `.venv/`.
+
+API mặc định chạy tại `http://127.0.0.1:8000`; PostgreSQL tại `127.0.0.1:5432`. Tài liệu có tại `/docs` ở development. Chạy `--host 0.0.0.0` cho iPhone thật cùng Wi-Fi và đặt URL app thành IP LAN của Mac, không dùng `0.0.0.0`/`127.0.0.1` trong app trên thiết bị thật. Deploy dùng HTTPS. Cổng hợp lệ là 1–65535; launcher không tự đổi cổng khi cổng bị chiếm.
+
+`GET /health` trả 200 khi database kết nối tốt, 503 khi database lỗi. `gemini=configured` không phải xác nhận model đang phục vụ; dùng `python scripts/ai_smoke_test.py --advisor` để thử AI thật trên dữ liệu tổng hợp. Lệnh này không ghi database, không gửi email, nhưng có sử dụng quota AI.
 
 ## PostgreSQL và migration
 
 Sao chép cấu hình mẫu rồi điền mật khẩu PostgreSQL cục bộ:
 
 ```bash
-cp .env.example .env
+test -f .env || cp .env.example .env
 ```
 
 Không commit file `.env`. Sau khi PostgreSQL đang chạy, tạo hoặc nâng cấp cấu trúc bảng bằng:
@@ -45,13 +50,15 @@ Không commit file `.env`. Sau khi PostgreSQL đang chạy, tạo hoặc nâng c
 ./.venv/bin/alembic current
 ```
 
-Hai migration hiện tại tạo các nhóm bảng:
+Các migration đến `20261014_0007` tạo các nhóm bảng:
 
 - `organizations`, `users`, `auth_sessions`: doanh nghiệp, vai trò và phiên đăng nhập;
 - `facilities`: cơ sở hoặc nhà xưởng;
 - `meters`: đồng hồ gắn với từng cơ sở;
 - `datasets`: thông tin một lần nhập dữ liệu;
 - `measurements`: từng điểm đo điện năng, sản lượng và giờ vận hành.
+- `dataset_insights`: báo cáo AI đã sinh, mở lại mà không gọi AI thêm;
+- `action_tasks`: công việc, người phụ trách, thời hạn, tiến độ và KPI.
 
 Mọi `facility`, `dataset` và `measurement` được gắn với doanh nghiệp. Token của công ty này không thể đọc hoặc phân tích dữ liệu của công ty khác.
 

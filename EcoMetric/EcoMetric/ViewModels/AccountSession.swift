@@ -28,7 +28,11 @@ final class AccountSession: ObservableObject {
             user = context.user
             organization = context.organization
         } catch {
-            clearLocalSession()
+            if case let AIRecommendationAPIError.server(code, _) = error, [401, 403].contains(code) {
+                clearLocalSession()
+            } else {
+                errorMessage = "Chưa kết nối được máy chủ để khôi phục đăng nhập. Kiểm tra mạng và máy chủ rồi mở lại ứng dụng; phiên đăng nhập đã lưu vẫn được giữ."
+            }
         }
     }
 

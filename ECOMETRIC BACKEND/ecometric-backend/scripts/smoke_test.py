@@ -47,6 +47,7 @@ def run(base_url: str):
     status, health = request_json(base_url, "/health")
     assert_test(status == 200, "Health check không trả HTTP 200.")
     assert_test(health.get("status") == "ok", "Backend chưa sẵn sàng.")
+    assert_test(health.get("database") == "ok", "PostgreSQL chưa sẵn sàng.")
     print(
         "✓ Health:",
         f"API {health.get('api_version')},",
